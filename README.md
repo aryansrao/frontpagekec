@@ -1,5 +1,8 @@
 # KEC Lab Manual Creator
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/535c1b36-092b-466e-b638-7d43e34ecf53/deploy-status)](https://app.netlify.com/projects/frontpagekec/deploys)
+[![GitHub](https://img.shields.io/badge/GitHub-aryansrao-181717?logo=github)](https://github.com/aryansrao)
+
 ## Overview
 KEC Lab Manual Creator is a web application designed to help students of Krishna Engineering College (KEC) easily generate professional lab manual cover pages. The project was inspired by the challenges faced by students who do not have access to laptops or consistent software environments, resulting in inconsistent and time-consuming manual cover creation. This tool streamlines the process, ensuring uniformity and accessibility for all students, regardless of their device or operating system.
 
@@ -74,6 +77,3 @@ This project is open-source and free to use for educational purposes.
 
 ## Author
 Created by Aryan S. Rao, inspired by the needs of KEC students for a simple, unified solution to lab manual cover creation.
-
-[![GitHub](https://img.shields.io/badge/GitHub-aryansrao-181717?logo=github)](https://github.com/aryansrao)
-

@@ -19,6 +19,7 @@ KEC Lab Manual Creator solves these problems by providing a simple, device-indep
 - **PDF Download:** Generates a high-quality PDF of the cover page for easy printing or sharing.
 - **Toast Notifications & Loading Animations:** Provides feedback and improves user experience.
 - **Modern UI:** Uses gradients, icons, and animations for a professional look.
+- **Progressive Web App (PWA):** Can be installed on your device for offline use and a native app-like experience.
 
 ## How It Works
 1. **Fill the Form:** Enter all required details (subject, student, faculty, etc.).
@@ -30,12 +31,15 @@ KEC Lab Manual Creator solves these problems by providing a simple, device-indep
 - **Font Awesome:** For modern icons.
 - **Google Fonts (Poppins, Roboto):** For clean, readable typography.
 - **html2canvas & jsPDF:** For rendering the cover and generating the PDF.
+- **PWA Manifest & Service Worker:** Enables installation and offline capabilities.
 
 ## Folder Structure
 ```
 frontpagekec/
 ├── index.html         # Main application file
 ├── keclogo.jpg        # College logo (used in the cover)
+├── manifest.json      # PWA manifest
+├── service-worker.js  # Service worker for offline support
 ```
 
 ## Usage
@@ -45,8 +49,20 @@ frontpagekec/
 4. Preview the cover page.
 5. Download the PDF and print or share as needed.
 
+## PWA Installation
+- **On Desktop (Chrome/Edge):**
+  1. Click the install icon in the address bar or open the browser menu and select "Install App".
+  2. The app will be added to your desktop and can be launched like any other application.
+- **On Mobile (Android/iOS):**
+  1. Open the site in your browser.
+  2. Tap the browser menu (three dots or share icon).
+  3. Select "Add to Home Screen" or "Install App".
+  4. The app icon will appear on your home screen for quick access and offline use.
+- **Offline Use:**
+  - Once installed, the app works offline and provides a native experience.
+
 ## Accessibility
-- No installation required.
+- No installation required (unless you want offline/app experience).
 - Works on any device with a browser (including smartphones).
 - No dependencies on OS or external software.
 
@@ -58,4 +74,6 @@ This project is open-source and free to use for educational purposes.
 
 ## Author
 Created by Aryan S. Rao, inspired by the needs of KEC students for a simple, unified solution to lab manual cover creation.
+
+[![GitHub](https://img.shields.io/badge/GitHub-aryansrao-181717?logo=github)](https://github.com/aryansrao)
 

@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEC Lab Manual Creator</title>
+    <!-- Libraries for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        /* Common styles */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #333;
+        }
+
+        button,
+        .btn {
+            padding: 12px 24px;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover,
+        .btn:hover {
+            background-color: #3367d6;
+        }
+
+        /* Form styles */
+        #form-section {
+            display: block;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: #4285f4;
+            outline: none;
+            box-shadow: 0 0 5px rgba(66, 133, 244, 0.3);
+        }
+
+        .submit-btn {
+            width: 100%;
+            font-size: 18px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .submit-btn i {
+            font-size: 20px;
+        }
+
+        /* Lab manual styles */
+        #preview-section {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .edit-btn {
+            background-color: #34a853;
+        }
+
+        .edit-btn:hover {
+            background-color: #2d9144;
+        }
+
+        .manual-container {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: white;
+        }
+
+        #content-to-download {
+            width: 210mm;
+            height: 297mm;
+            background-color: white;
+            padding: 20mm 15mm;
+            margin: 0;
+            position: relative;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .header h3 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .header h4 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .contact {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        #college-logo {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+        }
+
+        .main-title h2 {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 30px 0;
+            letter-spacing: 1px;
+        }
+
+        .subject-details {
+            margin: 40px 0;
+        }
+
+        .underlined {
+            display: inline-block;
+            border-bottom: 2px solid black;
+            padding-bottom: 4px;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .subject-code {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 25px 0;
+        }
+
+        .department {
+            margin: 25px 0 15px;
+        }
+
+        .semester {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 25px 0;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: absolute;
+            bottom: 15mm;
+            left: 0;
+            right: 0;
+            padding: 0 20mm;
+        }
+
+        .student-info {
+            text-align: left;
+        }
+
+        .student-info h4 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .student-info p {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .faculty-info {
+            text-align: right;
+        }
+
+        .faculty-info p {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Form validation styles */
+        .error-message {
+            color: #d32f2f;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        input.invalid {
+            border-color: #d32f2f !important;
+            background-color: #fef2f2;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        /* Add shake animation for invalid inputs */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* Loading spinner */
+        #loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        .spinner-content {
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Toast notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1001;
+            bottom: 30px;
+            right: 30px;
+            font-size: 16px;
+        }
+
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein {
+            from {
+                bottom: 0;
+                opacity: 0;
+            }
+
+            to {
+                bottom: 30px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeout {
+            from {
+                bottom: 30px;
+                opacity: 1;
+            }
+
+            to {
+                bottom: 0;
+                opacity: 0;
+            }
+        }
+
+        /* Responsive styles */
+        @media screen and (max-width: 210mm) {
+            .manual-container {
+                width: 100%;
+                height: auto;
+                min-height: 297mm;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header h3 {
+                font-size: 18px;
+            }
+
+            .footer {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .faculty-info {
+                text-align: left;
+            }
+        }
+
+        /* Hidden Preview Section - Fixed dimensions regardless of device */
+        #hidden-container {
+            position: fixed;
+            left: -9999px;
+            top: -9999px;
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden;
+        }
+    </style>
+    <!-- Add FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+
+<body>
+    <!-- Loading Spinner -->
+    <div id="loading-spinner">
+        <div class="spinner-content">
+            <div class="spinner"></div>
+            <p class="loading-text">Generating your PDF...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">PDF downloaded successfully!</div>
+
+    <!-- Form Section -->
+    <div class="container" id="form-section">
+        <h1 class="form-title">KEC Lab Manual Creator</h1>
+        <h3 class="form-subtitle">Fill in the details to generate and download your lab manual cover</h3>
+
+        <form id="lab-manual-form">
+            <div class="form-group">
+                <label for="subjectName">Subject Name:</label>
+                <input type="text" id="subjectName" name="subjectName"
+                    placeholder="e.g., COMPUTER SYSTEM ARCHITECTURE LAB" maxlength="100" required>
+                <div class="error-message" id="subjectName-error">
+                    Please enter a valid subject name (minimum 5 characters)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="subjectCode">Subject Code:</label>
+                <input type="text" id="subjectCode" name="subjectCode" placeholder="e.g., B022421(022)"
+                    pattern="[A-Za-z0-9()\-]+" required>
+                <div class="error-message" id="subjectCode-error">
+                    Please enter a valid subject code using letters, numbers, and symbols
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="semester">Semester Number:</label>
+                <input type="number" id="semester" name="semester" min="1" max="8" placeholder="1-8" required>
+                <div class="error-message" id="semester-error">
+                    Please enter a valid semester number (1-8)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="department">Department:</label>
+                <input type="text" id="department" name="department" placeholder="e.g., Computer Science & Engineering"
+                    maxlength="100" required>
+                <div class="error-message" id="department-error">
+                    Please enter a valid department name
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="studentName">Student Name:</label>
+                <input type="text" id="studentName" name="studentName" placeholder="Enter your full name"
+                    pattern="[A-Za-z\s]+" title="Please enter only letters and spaces" maxlength="50" required>
+                <div class="error-message" id="studentName-error">
+                    Please enter a valid name (letters and spaces only)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="rollNo">Roll Number:</label>
+                <input type="text" id="rollNo" name="rollNo" placeholder="e.g., 310002220XX" pattern="\d{1,12}"
+                    title="Please enter up to 12 digits only" maxlength="12"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                <div class="error-message" id="rollNo-error">
+                    Please enter a valid roll number (up to 12 digits)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="branch">Branch:</label>
+                <input type="text" id="branch" name="branch" placeholder="e.g., CSE" pattern="[A-Za-z\s&]+"
+                    title="Please enter only letters, spaces and & symbol" maxlength="10" required>
+                <div class="error-message" id="branch-error">
+                    Please enter a valid branch name
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="batch">Batch/Academic Year:</label>
+                <input type="text" id="batch" name="batch" placeholder="e.g., 2024-25" pattern="[0-9\-]+"
+                    title="Please use format YYYY-YY" maxlength="7" required>
+                <div class="error-message" id="batch-error">
+                    Please use format YYYY-YY (e.g., 2024-25)
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="facultyName">Faculty Name:</label>
+                <input type="text" id="facultyName" name="facultyName" placeholder="Enter faculty's full name"
+                    pattern="[A-Za-z\s\.]+" title="Please enter only letters, spaces and periods" maxlength="50"
+                    required>
+                <div class="error-message" id="facultyName-error">
+                    Please enter a valid faculty name
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="facultyDesignation">Faculty Designation:</label>
+                <input type="text" id="facultyDesignation" name="facultyDesignation" placeholder="e.g., Asst. Professor"
+                    pattern="[A-Za-z\s\.]+" title="Please enter only letters, spaces and periods" maxlength="30"
+                    required>
+                <div class="error-message" id="facultyDesignation-error">
+                    Please enter a valid designation
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-file-pdf"></i> Generate & Download PDF
+            </button>
+        </form>
+    </div>
+
+    <!-- Hidden Preview Section (will be used for PDF generation but not shown to user) -->
+    <div style="position: absolute; left: -9999px; top: -9999px;">
+        <div class="manual-container" id="content-to-download">
+            <div class="header">
+                <h1>KRISHNA ENGINEERING COLLEGE</h1>
+                <h3>Khamharia, Junwani-Bhilai (C.G.)</h3>
+                <h4>(Run by Krishna Education Society)</h4>
+                <p class="contact">Website: kecbhilai.com, E-mail: krishnaengineeringcollege@gmail.com</p>
+            </div>
+
+            <div class="logo">
+                <img src="keclogo.jpg" alt="KEC Logo" id="college-logo">
+            </div>
+
+            <div class="main-title">
+                <h2>LAB MANUAL</h2>
+            </div>
+
+            <div class="subject-details">
+                <h3 class="underlined" id="subject-title"></h3>
+                <p class="subject-code">Subject Code : <span id="subject-code"></span></p>
+                <h3 class="department underlined" id="department-title"></h3>
+                <p class="semester">B.Tech.- <span id="semester-value"></span><sup>th</sup> Sem</p>
+            </div>
+
+            <div class="footer">
+                <div class="student-info">
+                    <h4>Submitted By:</h4>
+                    <p id="student-name-value"></p>
+                    <p id="roll-no-value">Roll No.: </p>
+                    <p id="branch-value">Branch: </p>
+                    <p id="batch-value">Batch: </p>
+                </div>
+
+                <div class="faculty-info">
+                    <p id="faculty-name-value"></p>
+                    <p id="faculty-designation-value"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get form elements
+            const labManualForm = document.getElementById('lab-manual-form');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const toast = document.getElementById('toast');
+
+            // Clear localStorage
+            clearLocalStorage();
+
+            // Validation rules
+            const validationRules = {
+                subjectName: {
+                    pattern: /^[A-Za-z0-9\s&()]{5,}$/,
+                    message: 'Subject name must be at least 5 characters long'
+                },
+                subjectCode: {
+                    pattern: /^[A-Za-z0-9()\-]+$/,
+                    message: 'Enter a valid subject code'
+                },
+                semester: {
+                    pattern: /^[1-8]$/,
+                    message: 'Semester must be between 1 and 8'
+                },
+                department: {
+                    pattern: /^[A-Za-z\s&]{3,}$/,
+                    message: 'Enter a valid department name'
+                },
+                studentName: {
+                    pattern: /^[A-Za-z\s]{3,}$/,
+                    message: 'Enter a valid name (letters and spaces only)'
+                },
+                rollNo: {
+                    pattern: /^\d{1,12}$/,
+                    message: 'Enter a valid roll number (up to 12 digits)'
+                },
+                branch: {
+                    pattern: /^[A-Za-z&\s]{2,10}$/,
+                    message: 'Enter a valid branch name'
+                },
+                batch: {
+                    pattern: /^\d{4}-\d{2}$/,
+                    message: 'Use format YYYY-YY (e.g., 2024-25)'
+                },
+                facultyName: {
+                    pattern: /^[A-Za-z\s\.]{3,}$/,
+                    message: 'Enter a valid faculty name'
+                },
+                facultyDesignation: {
+                    pattern: /^[A-Za-z\s\.]{3,}$/,
+                    message: 'Enter a valid designation'
+                }
+            };
+
+            // Add real-time validation to all inputs
+            Object.keys(validationRules).forEach(fieldId => {
+                const input = document.getElementById(fieldId);
+                const errorElement = document.getElementById(`${fieldId}-error`);
+
+                input.addEventListener('input', () => validateField(input, validationRules[fieldId], errorElement));
+                input.addEventListener('blur', () => validateField(input, validationRules[fieldId], errorElement));
+            });
+
+            // Form submission handler with validation
+            labManualForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                let isValid = true;
+
+                Object.keys(validationRules).forEach(fieldId => {
+                    const input = document.getElementById(fieldId);
+                    const errorElement = document.getElementById(`${fieldId}-error`);
+
+                    if (!validateField(input, validationRules[fieldId], errorElement)) {
+                        isValid = false;
+                        if (!document.querySelector('.invalid')) {
+                            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                });
+
+                if (isValid) {
+                    // Show loading spinner
+                    loadingSpinner.style.display = 'flex';
+
+                    // Update the hidden manual content with form values
+                    updateLabManual();
+
+                    // Short delay to ensure DOM is updated before generating PDF
+                    setTimeout(() => {
+                        generatePDF();
+                    }, 200);
+                }
+            });
+
+            // Validation helper functions
+            function validateField(input, rule, errorElement) {
+                const value = input.value.trim();
+
+                if (!value) {
+                    showError(input, errorElement, 'This field is required');
+                    return false;
+                }
+
+                if (!rule.pattern.test(value)) {
+                    showError(input, errorElement, rule.message);
+                    return false;
+                }
+
+                hideError(input, errorElement);
+                return true;
+            }
+
+            function showError(input, errorElement, message) {
+                input.classList.add('invalid');
+                input.classList.add('shake');
+                errorElement.textContent = message;
+                errorElement.classList.add('visible');
+                setTimeout(() => input.classList.remove('shake'), 500);
+            }
+
+            function hideError(input, errorElement) {
+                input.classList.remove('invalid');
+                errorElement.classList.remove('visible');
+            }
+
+            function clearLocalStorage() {
+                const fields = [
+                    'subjectName', 'subjectCode', 'semester', 'department',
+                    'studentName', 'rollNo', 'branch', 'batch',
+                    'facultyName', 'facultyDesignation'
+                ];
+
+                fields.forEach(field => {
+                    localStorage.removeItem(field);
+                });
+            }
+
+            function updateLabManual() {
+                // Update subject details
+                document.getElementById('subject-title').textContent =
+                    document.getElementById('subjectName').value;
+
+                document.getElementById('subject-code').textContent =
+                    document.getElementById('subjectCode').value;
+
+                document.getElementById('department-title').textContent =
+                    formatDepartment(document.getElementById('department').value);
+
+                document.getElementById('semester-value').textContent =
+                    document.getElementById('semester').value;
+
+                // Update student info
+                document.getElementById('student-name-value').textContent =
+                    document.getElementById('studentName').value;
+
+                document.getElementById('roll-no-value').textContent =
+                    'Roll No.: ' + document.getElementById('rollNo').value;
+
+                document.getElementById('branch-value').textContent =
+                    'Branch: ' + document.getElementById('branch').value;
+
+                document.getElementById('batch-value').textContent =
+                    'Batch: ' + document.getElementById('batch').value;
+
+                // Update faculty info
+                document.getElementById('faculty-name-value').textContent =
+                    document.getElementById('facultyName').value;
+
+                document.getElementById('faculty-designation-value').textContent =
+                    document.getElementById('facultyDesignation').value;
+            }
+
+            function formatDepartment(dept) {
+                // Make sure department has "Department of" prefix
+                if (!dept.toLowerCase().includes('department')) {
+                    return 'Department of ' + dept;
+                }
+                return dept;
+            }
+
+            function showToast() {
+                toast.className = "show";
+                setTimeout(function () { toast.className = toast.className.replace("show", ""); }, 3000);
+            }
+
+            function generatePDF() {
+                const { jsPDF } = window.jspdf;
+
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4',
+                    compress: true
+                });
+
+                const element = document.getElementById('content-to-download');
+
+                // Enhanced html2canvas options for consistent rendering
+                html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    windowWidth: element.scrollWidth,
+                    windowHeight: element.scrollHeight,
+                    x: 0,
+                    y: 0,
+                    scrollX: 0,
+                    scrollY: 0,
+                    width: element.offsetWidth,
+                    height: element.offsetHeight,
+                    onclone: (doc) => {
+                        // Ensure the cloned element has the correct dimensions
+                        const clone = doc.getElementById('content-to-download');
+                        clone.style.transform = 'none';
+                        clone.style.zoom = '1';
+                    }
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+                    // Use exact A4 dimensions
+                    const pdfWidth = 210;
+                    const pdfHeight = 297;
+
+                    // Add image with exact dimensions
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+                    // Get student name for filename
+                    const studentName = document.getElementById('studentName').value || 'Student';
+                    const safeName = studentName.replace(/\s+/g, '_');
+
+                    // Download the PDF
+                    pdf.save(`KEC_Lab_Manual_${safeName}.pdf`);
+
+                    // Hide loading spinner
+                    loadingSpinner.style.display = 'none';
+
+                    // Show success toast
+                    showToast();
+                }).catch(error => {
+                    console.error("Error generating PDF:", error);
+                    loadingSpinner.style.display = 'none';
+                    alert("Error generating PDF. Please try again.");
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

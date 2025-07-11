@@ -1,0 +1,16 @@
+{
+  "name": "KEC Lab Manual Creator",
+  "short_name": "LabManual",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#4285f4",
+  "description": "Generate and download custom lab manual covers for KEC students.",
+  "icons": [
+    {
+      "src": "keclogo.jpg",
+      "sizes": "180x180",
+      "type": "image/jpeg"
+    }
+  ]
+}

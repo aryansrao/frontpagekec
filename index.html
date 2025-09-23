@@ -717,6 +717,22 @@
                 animation: none !important;
             }
         }
+        /* Force refresh button (mobile visible) */
+        .force-refresh {
+            position: fixed;
+            right: 14px;
+            bottom: 14px;
+            z-index: 1500;
+        }
+
+        .force-refresh .btn {
+            background: #ef4444;
+            padding: 10px 14px;
+            border-radius: 999px;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 6px 18px rgba(239,68,68,0.18);
+        }
         </style>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -742,6 +758,11 @@
             </div>
             <button class="close-overlay" id="close-download-overlay">Close</button>
         </div>
+    </div>
+
+    <!-- Force refresh helper (visible button) -->
+    <div class="force-refresh" id="force-refresh" title="Force refresh site resources">
+        <button id="force-refresh-btn" class="btn">Force refresh</button>
     </div>
 
     <!-- Form Section -->
@@ -1150,6 +1171,37 @@
                     }
                 }
             });
+
+            // Force refresh button wiring
+            const forceBtn = document.getElementById('force-refresh-btn');
+            if (forceBtn) {
+                forceBtn.addEventListener('click', async function () {
+                    try {
+                        // unregister service workers
+                        if ('serviceWorker' in navigator) {
+                            const regs = await navigator.serviceWorker.getRegistrations().catch(()=>[]);
+                            await Promise.all((regs||[]).map(r => r.unregister().catch(()=>{})));
+                        }
+
+                        // clear caches
+                        if ('caches' in window) {
+                            const keys = await caches.keys().catch(()=>[]);
+                            await Promise.all((keys||[]).map(k => caches.delete(k).catch(()=>{})));
+                        }
+
+                        // Reload with cache-busting param
+                        try {
+                            const u = new URL(location.href);
+                            u.searchParams.set('_kec_cb', Date.now().toString());
+                            location.replace(u.toString());
+                        } catch (e) {
+                            try { location.reload(); } catch(e){}
+                        }
+                    } catch (e) {
+                        try { console.warn('Force refresh failed', e); } catch(e){}
+                    }
+                });
+            }
 
             function generatePDF() {
                 const { jsPDF } = window.jspdf;

@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KEC - Front page creator</title>
+    <!-- Help browsers revalidate the main document on each load -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <!-- Per-reload silent cleanup: unregister service workers and clear Cache Storage on every load.
          To avoid reload loops we add a temporary cache-busting param then remove it from history. -->
     <script>
@@ -18,9 +22,12 @@
             const hasCb = urlObj ? urlObj.searchParams.has(CB_PARAM) : false;
 
             async function cleanupOnce() {
+                const result = { swCount: 0, swIds: [], cacheKeys: [] };
                 try {
                     if ('serviceWorker' in navigator) {
                         const regs = await navigator.serviceWorker.getRegistrations().catch(()=>[]);
+                        result.swCount = regs.length || 0;
+                        result.swIds = (regs || []).map(r => r.scope || r.active && r.active.scriptURL).filter(Boolean);
                         if (regs && regs.length) {
                             await Promise.all(regs.map(r => r.unregister().catch(()=>{})));
                         }
@@ -29,18 +36,21 @@
 
                     if ('caches' in window) {
                         const keys = await caches.keys().catch(()=>[]);
+                        result.cacheKeys = keys || [];
                         if (keys && keys.length) {
                             await Promise.all(keys.map(k => caches.delete(k).catch(()=>{})));
                         }
                     }
                 } catch (e) {
                     // ignore failures
+                    try { console.warn('kec: cleanupOnce error', e); } catch(e){}
                 }
+                return result;
             }
 
             async function runCleanup() {
                 const did = await cleanupOnce();
-                try { console.info('kec: cleanup attempted'); } catch(e){}
+                try { console.info('kec: cleanup attempted', did); } catch(e){}
 
                 // After attempting cleanup, force-refresh same-origin images and stylesheets by adding a cache-busting param.
                 function bustAssets() {
@@ -71,6 +81,39 @@
                                     u.searchParams.set(CB_PARAM, cb);
                                     img.setAttribute('src', u.toString());
                                 }
+                            } catch(e) {}
+                        });
+
+                        // Dynamically reload same-origin scripts by injecting new script tags with cache-bust
+                        document.querySelectorAll('script[src]').forEach(script => {
+                            try {
+                                const src = script.getAttribute('src');
+                                if (!src) return;
+                                const u = new URL(src, location.href);
+                                if (u.origin !== origin) return; // skip cross-origin
+
+                                // Avoid double-adding if the script already has our CB param
+                                if (u.searchParams.has(CB_PARAM)) return;
+
+                                const newUrl = u;
+                                newUrl.searchParams.set(CB_PARAM, cb);
+
+                                const replacement = document.createElement('script');
+                                replacement.src = newUrl.toString();
+                                // preserve type/module
+                                if (script.type) replacement.type = script.type;
+                                if (script.async) replacement.async = script.async;
+                                // Insert after the original to preserve execution order roughly
+                                script.parentNode.insertBefore(replacement, script.nextSibling);
+
+                                // When new script loads, remove the old one
+                                replacement.addEventListener('load', () => {
+                                    try { script.parentNode && script.parentNode.removeChild(script); } catch(e) {}
+                                });
+                                // On error, remove the injected script so we don't leave broken ones
+                                replacement.addEventListener('error', () => {
+                                    try { replacement.parentNode && replacement.parentNode.removeChild(replacement); } catch(e) {}
+                                });
                             } catch(e) {}
                         });
                     } catch(e) {}

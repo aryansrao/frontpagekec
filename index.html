@@ -13,6 +13,8 @@
     <!-- Libraries for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- GSAP for subtle UI animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -1130,6 +1132,87 @@
     <div class="site-footer">
         Built by <a href="https://github.com/aryansrao" target="_blank" rel="noopener noreferrer">Aryan</a>
     </div>
+    
+    <!-- GSAP animations: entrance, button interactions, overlay animations -->
+    <script>
+    (function(){
+        // Wait for DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // Entrance: container and form groups
+                gsap.from('.container', { duration: 0.6, y: 16, opacity: 0, ease: 'power3.out' });
+
+                const groups = document.querySelectorAll('.form-group');
+                if (groups.length) {
+                    gsap.from(groups, { duration: 0.6, y: 10, opacity: 0, stagger: 0.06, delay: 0.12, ease: 'power3.out' });
+                }
+
+                // Logo subtle pop
+                const logo = document.querySelector('.kec-logo-img');
+                if (logo) gsap.from(logo, { duration: 0.6, scale: 0.96, opacity: 0, delay: 0.05, ease: 'back.out(1.1)'});
+
+                // Button hover and tap interactions
+                const btn = document.querySelector('.submit-btn');
+                if (btn) {
+                    btn.addEventListener('mouseenter', () => gsap.to(btn, { scale: 1.03, duration: 0.16, ease: 'power1.out' }));
+                    btn.addEventListener('mouseleave', () => gsap.to(btn, { scale: 1, duration: 0.22, ease: 'power1.out' }));
+                    // mobile/tap feedback
+                    btn.addEventListener('pointerdown', () => gsap.to(btn, { scale: 0.98, duration: 0.06 }));
+                    btn.addEventListener('pointerup', () => gsap.to(btn, { scale: 1.03, duration: 0.08 }));
+                }
+
+                // Observe the download overlay open/close to play a short animation
+                const overlay = document.getElementById('download-overlay');
+                if (overlay) {
+                    const card = overlay.querySelector('.download-card');
+                    const barFillContainer = overlay.querySelector('.checkbar');
+
+                    // ensure bar markup exists
+                    if (barFillContainer && !barFillContainer.querySelector('.bar-track')) {
+                        barFillContainer.innerHTML = '<div class="bar-track" style="width:80%;height:8px;background:#e6e6e6;border-radius:999px;overflow:hidden;"></div>';
+                        const track = barFillContainer.querySelector('.bar-track');
+                        const fill = document.createElement('div');
+                        fill.className = 'bar-fill';
+                        fill.style.cssText = 'height:100%;width:0%;background:#16a34a;border-radius:999px;transform-origin:left center;';
+                        track.appendChild(fill);
+                    }
+
+                    const obs = new MutationObserver(muts => {
+                        muts.forEach(m => {
+                            if (m.type === 'attributes' && m.attributeName === 'class') {
+                                const isOpen = overlay.classList.contains('download-open');
+                                if (isOpen) {
+                                    // show card with pop
+                                    if (card) {
+                                        gsap.fromTo(card, { y: 8, scale: 0.98, opacity: 0 }, { y:0, scale:1, opacity:1, duration: 0.32, ease: 'power3.out' });
+                                    }
+                                    // animate bar fill then pop check
+                                    const fill = overlay.querySelector('.bar-fill');
+                                    const check = overlay.querySelector('.checkmark');
+                                    if (fill) {
+                                        gsap.fromTo(fill, { width: '0%' }, { width: '100%', duration: 0.75, ease: 'power2.out' });
+                                    }
+                                    if (check) {
+                                        gsap.fromTo(check, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.36, ease: 'back.out(1.2)', delay: 0.7 });
+                                    }
+                                } else {
+                                    // hide card
+                                    if (card) gsap.to(card, { opacity: 0, y: 6, duration: 0.22, ease: 'power1.in' });
+                                    const fill = overlay.querySelector('.bar-fill');
+                                    if (fill) gsap.set(fill, { width: '0%' });
+                                }
+                            }
+                        });
+                    });
+                    obs.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+                }
+            } catch (e) {
+                // don't break the app if GSAP is missing or errors
+                console.warn('GSAP animation setup failed', e);
+            }
+        });
+    })();
+    </script>
 </body>
 
 </html>

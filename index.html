@@ -349,40 +349,7 @@
 
         /* (Removed shake animation - errors will be shown in red only) */
 
-        /* Loading overlay with blur background (no spinner) */
-        #loading-spinner {
-            /* hidden by default; shown by JS when needed */
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .loading-card {
-            background: rgba(255,255,255,0.95);
-            padding: 20px 28px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-            text-align: center;
-            min-width: 220px;
-        }
-
-        .loading-text {
-            color: #0f172a;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .loading-sub {
-            color: #475569;
-            font-size: 13px;
-            margin-top: 8px;
-        }
+        /* (loading-state removed) */
 
         /* Download overlay (shown after successful PDF save)
            Uses opacity/visibility + transform transitions so it can fade/slide in and out.
@@ -456,6 +423,22 @@
             font-size: 14px;
             color: #475569;
             margin-bottom: 18px;
+        }
+
+        /* Overlay internal state: show success box when overlay is open.
+           Keep the success box centered with a stable min-height so it doesn't jump. */
+        .download-card .overlay-success {
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* When overlay is open, show success state */
+        #download-overlay.download-open .download-card .overlay-success {
+            display: flex;
         }
 
         .download-card .close-overlay {
@@ -563,9 +546,7 @@
         /* Respect users who prefer reduced motion: disable overlay/card transitions */
         @media (prefers-reduced-motion: reduce) {
             #download-overlay,
-            .download-card,
-            #loading-spinner,
-            .loading-card {
+            .download-card {
                 transition: none !important;
                 transform: none !important;
                 animation: none !important;
@@ -607,21 +588,16 @@
 </head>
 
 <body>
-    <!-- Loading overlay (blur background) -->
-    <div id="loading-spinner">
-        <div class="loading-card" role="status" aria-live="polite">
-            <div class="loading-text">Generating your PDF...</div>
-            <div class="loading-sub">Please wait while we prepare your file.</div>
-        </div>
-    </div>
-
-    <!-- Download overlay (replaces toast notification) -->
+    <!-- Download overlay: only show success state after PDF save -->
     <div id="download-overlay" aria-hidden="true">
-            <div class="download-card" role="dialog" aria-modal="true" aria-labelledby="download-title">
-            <div class="checkmark">✓</div>
-            <div id="download-title" class="download-msg">Download successful</div>
-            <div class="download-sub">Your PDF has been saved to your device.</div>
-            <!-- Check animation area (checkmark only) -->
+        <div class="download-card" role="dialog" aria-modal="true" aria-labelledby="download-title">
+            <!-- Success state (shown after file has been saved) -->
+            <div class="overlay-success" aria-hidden="true">
+                <div class="checkmark">✓</div>
+                <div id="download-title" class="download-msg">Download successful</div>
+                <div class="download-sub">Your PDF has been saved to your device.</div>
+            </div>
+
             <button class="close-overlay" id="close-download-overlay">Close</button>
         </div>
     </div>
@@ -787,7 +763,7 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Get form elements
             const labManualForm = document.getElementById('lab-manual-form');
-            const loadingSpinner = document.getElementById('loading-spinner');
+            const overlay = document.getElementById('download-overlay');
             const toast = document.getElementById('toast');
 
             // Clear localStorage
@@ -870,9 +846,6 @@
                 });
 
                 if (isValid) {
-                    // Show loading spinner
-                    loadingSpinner.style.display = 'flex';
-
                     // Update the hidden manual content with form values
                     updateLabManual();
 
@@ -988,33 +961,17 @@
                 return dept;
             }
 
-            // New download overlay handling (replaces toast)
-            function showDownloadOverlay() {
-                const overlay = document.getElementById('download-overlay');
-                if (!overlay) return;
-                overlay.classList.add('download-open');
-                overlay.setAttribute('aria-hidden', 'false');
-                // trigger animated checkbar on the card
-                const card = overlay.querySelector('.download-card');
-                if (card) {
-                    // restart animation by removing and re-adding the class
-                    card.classList.remove('check-animate');
-                    // force reflow
-                    void card.offsetWidth;
-                    card.classList.add('check-animate');
-                }
-            }
 
+            // Hide the download overlay (used by close button / Escape)
             function hideDownloadOverlay() {
                 const overlay = document.getElementById('download-overlay');
                 if (!overlay) return;
-                // remove the open class to trigger fade-out animation
                 overlay.classList.remove('download-open');
                 overlay.setAttribute('aria-hidden', 'true');
-                // remove animation class so it can replay next time
                 const card = overlay.querySelector('.download-card');
                 if (card) {
                     card.classList.remove('check-animate');
+                    card.classList.remove('success-state');
                 }
             }
 
@@ -1092,14 +1049,24 @@
                     // Download the PDF
                     pdf.save(`KEC_Lab_Manual_${safeName}.pdf`);
 
-                    // Hide loading spinner
-                    loadingSpinner.style.display = 'none';
-
-                    // Show success overlay
-                    showDownloadOverlay();
+                        // Open the overlay and show the success state
+                        const overlayEl = document.getElementById('download-overlay');
+                        if (overlayEl) {
+                            overlayEl.classList.add('download-open');
+                            overlayEl.setAttribute('aria-hidden', 'false');
+                            const card = overlayEl.querySelector('.download-card');
+                            if (card) {
+                                card.classList.add('success-state');
+                                // trigger the checkmark animation class
+                                card.classList.remove('check-animate');
+                                void card.offsetWidth;
+                                card.classList.add('check-animate');
+                            }
+                        }
                 }).catch(error => {
                     console.error("Error generating PDF:", error);
-                    loadingSpinner.style.display = 'none';
+                    // close the overlay if open
+                    hideDownloadOverlay();
                     alert("Error generating PDF. Please try again.");
                 });
             }

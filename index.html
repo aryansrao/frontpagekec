@@ -668,7 +668,7 @@
                 <input type="text" id="subjectName" name="subjectName"
                     placeholder="e.g., COMPUTER SYSTEM ARCHITECTURE LAB" maxlength="100" required>
                 <div class="error-message" id="subjectName-error">
-                    Please enter a valid subject name (minimum 5 characters)
+                    Please enter a valid subject name (minimum 2 characters)
                 </div>
             </div>
 
@@ -821,8 +821,8 @@
                     message: 'Please enter a page title (3-40 characters)'
                 },
                 subjectName: {
-                    pattern: /^[A-Za-z0-9\s&()]{5,}$/,
-                    message: 'Subject name must be at least 5 characters long'
+                    pattern: /^[A-Za-z0-9\s&()]{2,}$/,
+                    message: 'Subject name must be at least 2 characters long'
                 },
                 subjectCode: {
                     pattern: /^[A-Za-z0-9()\-]+$/,

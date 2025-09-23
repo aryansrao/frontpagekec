@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KEC Lab Manual Creator</title>
+    <title>KEC - Front page creator</title>
     <!-- Libraries for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -16,25 +16,58 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
-        body {
-            background-color: #f5f5f5;
+        html, body {
+            background-color: #ffffff; /* plain white background */
             padding: 20px;
+            height: 100%;
         }
 
         /* Common styles */
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: white;
+            /* Blend with page background so it doesn't look like a card */
+            background-color: transparent;
             padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
         }
 
         h1,
         h2,
         h3 {
             color: #333;
+        }
+
+        /* Special display font for the short KEC title */
+        .kec-logo-text {
+            font-family: 'Bebas Neue', Arial, sans-serif;
+            font-size: 48px;
+            color: #2b6cb0; /* cool blue accent, change if you want */
+            letter-spacing: 1px;
+            display: inline-block;
+            line-height: 1;
+            vertical-align: middle;
+        }
+
+        /* Logo image used in the header */
+        .kec-logo-img {
+            width: 120px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Minimal font for the second line of the form title */
+        .form-title-text {
+            font-family: 'Inter', Arial, sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            color: #2b2b2b;
+            letter-spacing: 0.2px;
+            display: block;
+            margin-top: 6px;
         }
 
         button,
@@ -68,6 +101,10 @@
             text-align: center;
             margin-bottom: 20px;
             color: #666;
+            font-family: 'Inter', Arial, sans-serif;
+            font-weight: 400;
+            font-size: 15px;
+            letter-spacing: 0.2px;
         }
 
         .form-group {
@@ -77,8 +114,10 @@
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
+            font-family: 'Inter', Arial, sans-serif;
+            font-weight: 600;
+            color: #374151; /* slightly darker slate */
+            letter-spacing: 0.2px;
         }
 
         input[type="text"],
@@ -88,7 +127,19 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 16px;
+            font-family: 'Inter', Arial, sans-serif;
         }
+
+        /* Placeholder typography to match labels (minimalistic) */
+        input::placeholder {
+            font-family: 'Inter', Arial, sans-serif;
+            color: #9CA3AF; /* subdued gray */
+            font-weight: 400;
+        }
+        input::-webkit-input-placeholder { font-family: 'Inter', Arial, sans-serif; }
+        input::-moz-placeholder { font-family: 'Inter', Arial, sans-serif; }
+        input:-ms-input-placeholder { font-family: 'Inter', Arial, sans-serif; }
+        input:-moz-placeholder { font-family: 'Inter', Arial, sans-serif; }
 
         input[type="text"]:focus,
         input[type="number"]:focus {
@@ -98,13 +149,16 @@
         }
 
         .submit-btn {
-            width: 100%;
-            font-size: 18px;
-            margin-top: 20px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
+            padding: 12px 28px;
+            font-size: 16px;
+            margin: 20px auto 0 auto;
+            width: auto;
+            border-radius: 999px; /* pill */
+            box-shadow: none;
         }
 
         .submit-btn i {
@@ -271,113 +325,184 @@
             display: block;
         }
 
-        /* Add shake animation for invalid inputs */
-        @keyframes shake {
+        /* (Removed shake animation - errors will be shown in red only) */
 
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-10px);
-            }
-
-            75% {
-                transform: translateX(10px);
-            }
-        }
-
-        .shake {
-            animation: shake 0.5s ease-in-out;
-        }
-
-        /* Loading spinner */
+        /* Loading overlay with blur background (no spinner) */
         #loading-spinner {
+            /* hidden by default; shown by JS when needed */
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            inset: 0;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #4285f4;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .loading-card {
+            background: rgba(255,255,255,0.95);
+            padding: 20px 28px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            text-align: center;
+            min-width: 220px;
         }
 
         .loading-text {
-            color: white;
-            font-size: 18px;
-            margin-top: 15px;
-        }
-
-        .spinner-content {
-            text-align: center;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Toast notification */
-        #toast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: #4CAF50;
-            color: white;
-            text-align: center;
-            border-radius: 4px;
-            padding: 16px;
-            position: fixed;
-            z-index: 1001;
-            bottom: 30px;
-            right: 30px;
+            color: #0f172a;
             font-size: 16px;
+            font-weight: 600;
         }
 
-        #toast.show {
+        .loading-sub {
+            color: #475569;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        /* Download overlay (shown after successful PDF save)
+           Uses opacity/visibility + transform transitions so it can fade/slide in and out.
+        */
+        #download-overlay {
+            position: fixed;
+            inset: 0;
+            /* semi-transparent dark layer plus backdrop blur for frosted/blurred background */
+            background: rgba(0,0,0,0.38);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 1002;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* hidden by default but present in layout so we can transition */
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 260ms cubic-bezier(.2,.9,.2,1), visibility 260ms step-end;
+        }
+
+        /* When open, make overlay visible and interactive */
+        #download-overlay.download-open {
+            opacity: 1;
             visibility: visible;
-            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+            pointer-events: auto;
+            transition: opacity 260ms cubic-bezier(.2,.9,.2,1), visibility 0ms;
         }
 
-        @keyframes fadein {
-            from {
-                bottom: 0;
-                opacity: 0;
-            }
-
-            to {
-                bottom: 30px;
-                opacity: 1;
-            }
+        .download-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px 36px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 420px;
+            width: 90%;
+            /* start slightly lowered and scaled down for subtle motion */
+            transform: translateY(8px) scale(0.98);
+            opacity: 0;
+            transition: transform 260ms cubic-bezier(.2,.9,.2,1), opacity 260ms cubic-bezier(.2,.9,.2,1);
         }
 
-        @keyframes fadeout {
-            from {
-                bottom: 30px;
-                opacity: 1;
-            }
+        /* When overlay is open, animate the card to full opacity/position */
+        #download-overlay.download-open .download-card {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
 
-            to {
-                bottom: 0;
-                opacity: 0;
-            }
+        .download-card .checkmark {
+            width: 96px;
+            height: 96px;
+            border-radius: 50%;
+            background: #16a34a; /* green */
+            color: white;
+            font-size: 56px;
+            line-height: 96px;
+            margin: 0 auto 16px auto;
+            box-shadow: 0 6px 18px rgba(22,163,74,0.35);
+        }
+
+        .download-card .download-msg {
+            font-size: 20px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+
+        .download-card .download-sub {
+            font-size: 14px;
+            color: #475569;
+            margin-bottom: 18px;
+        }
+
+        .download-card .close-overlay {
+            padding: 10px 18px;
+            background: #0f172a;
+            color: #fff;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* Checkbar styles */
+        .checkbar {
+            margin: 18px 0 8px 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .bar-track {
+            width: 80%;
+            height: 10px;
+            background: rgba(15,23,42,0.08);
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+
+        .bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #34d399, #10b981);
+            border-radius: 999px;
+            transform-origin: left center;
+        }
+
+        /* keyframes for filling the bar */
+        @keyframes fillBar {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        /* pop animation for checkmark */
+        @keyframes popCheck {
+            0% { transform: scale(0.6); opacity: 0; }
+            60% { transform: scale(1.12); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* When the card has the .check-animate class, play the fill then pop animations */
+        .download-card.check-animate .bar-fill {
+            animation: fillBar 760ms cubic-bezier(.2,.9,.2,1) forwards;
+        }
+
+        .download-card .checkmark {
+            display: inline-block;
+            width: 96px;
+            height: 96px;
+            line-height: 96px;
+            font-size: 56px;
+            transition: transform 220ms ease-out, opacity 220ms ease-out;
+            transform: scale(0.85);
+            opacity: 0.0;
+        }
+
+        /* pop the check after the fill completes (slight delay) */
+        .download-card.check-animate .checkmark {
+            animation: popCheck 320ms cubic-bezier(.2,.9,.2,1) 720ms both;
         }
 
         /* Responsive styles */
@@ -407,6 +532,19 @@
                 width: 100%;
             }
 
+            /* Keep the download button compact and centered on small screens */
+            .submit-btn {
+                width: auto !important;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+
+        /* Center only the submit button area */
+        .form-actions {
+            text-align: center;
+            margin-top: 12px;
+        }
             .header h1 {
                 font-size: 24px;
             }
@@ -434,46 +572,59 @@
             height: 297mm;
             overflow: hidden;
         }
-    </style>
-    <!-- Add FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4285f4">
-    <!-- PWA iOS support -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="keclogo.jpg">
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('service-worker.js').then(function(registration) {
-            // Registration successful
-          }, function(err) {
-            // Registration failed
-          });
-        });
-      }
-    </script>
+        /* Respect users who prefer reduced motion: disable overlay/card transitions */
+        @media (prefers-reduced-motion: reduce) {
+            #download-overlay,
+            .download-card,
+            #loading-spinner,
+            .loading-card {
+                transition: none !important;
+                transform: none !important;
+                animation: none !important;
+            }
+        }
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Loading Spinner -->
+    <!-- Loading overlay (blur background) -->
     <div id="loading-spinner">
-        <div class="spinner-content">
-            <div class="spinner"></div>
-            <p class="loading-text">Generating your PDF...</p>
+        <div class="loading-card" role="status" aria-live="polite">
+            <div class="loading-text">Generating your PDF...</div>
+            <div class="loading-sub">Please wait while we prepare your file.</div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast">PDF downloaded successfully!</div>
+    <!-- Download overlay (replaces toast notification) -->
+    <div id="download-overlay" aria-hidden="true">
+        <div class="download-card" role="dialog" aria-modal="true" aria-labelledby="download-title">
+            <div class="checkmark">✓</div>
+            <div id="download-title" class="download-msg">Download successful</div>
+            <div class="download-sub">Your PDF has been saved to your device.</div>
+            <!-- Animated checkbar: fills, then checkmark pops in -->
+            <div class="checkbar" aria-hidden="true">
+                <div class="bar-track">
+                    <div class="bar-fill"></div>
+                </div>
+            </div>
+            <button class="close-overlay" id="close-download-overlay">Close</button>
+        </div>
+    </div>
 
     <!-- Form Section -->
     <div class="container" id="form-section">
-        <h1 class="form-title">KEC Lab Manual Creator</h1>
+    <h1 class="form-title"><img src="keclogo.jpg" alt="KEC Logo" class="kec-logo-img"> <span class="form-title-text">Lab Manual Creator</span></h1>
         <h3 class="form-subtitle">Fill in the details to generate and download your lab manual cover</h3>
+
+        <div class="form-group">
+            <label for="pageTitle">Type of Page / Title:</label>
+            <input type="text" id="pageTitle" name="pageTitle" placeholder="e.g., LAB MANUAL" maxlength="40" required>
+            <div class="error-message" id="pageTitle-error">
+                Please enter a page title (3-40 characters)
+            </div>
+        </div>
 
         <form id="lab-manual-form">
             <div class="form-group">
@@ -487,10 +638,9 @@
 
             <div class="form-group">
                 <label for="subjectCode">Subject Code:</label>
-                <input type="text" id="subjectCode" name="subjectCode" placeholder="e.g., B022421(022)"
-                    pattern="[A-Za-z0-9()\-]+" required>
+                <input type="text" id="subjectCode" name="subjectCode" placeholder="e.g., B022421(022)" required>
                 <div class="error-message" id="subjectCode-error">
-                    Please enter a valid subject code using letters, numbers, and symbols
+                    Please enter a valid subject code using letters, numbers, and brackets
                 </div>
             </div>
 
@@ -514,9 +664,9 @@
             <div class="form-group">
                 <label for="studentName">Student Name:</label>
                 <input type="text" id="studentName" name="studentName" placeholder="Enter your full name"
-                    pattern="[A-Za-z\s]+" title="Please enter only letters and spaces" maxlength="50" required>
+                    pattern="[A-Za-z\s\.]+" title="Please enter only letters, spaces and periods" maxlength="50" required>
                 <div class="error-message" id="studentName-error">
-                    Please enter a valid name (letters and spaces only)
+                    Please enter a valid name (letters, spaces and periods only)
                 </div>
             </div>
 
@@ -541,10 +691,9 @@
 
             <div class="form-group">
                 <label for="batch">Batch/Academic Year:</label>
-                <input type="text" id="batch" name="batch" placeholder="e.g., 2024-25" pattern="[0-9\-]+"
-                    title="Please use format YYYY-YY" maxlength="7" required>
+                <input type="text" id="batch" name="batch" placeholder="e.g., 2024 or 2024-25" maxlength="7" required>
                 <div class="error-message" id="batch-error">
-                    Please use format YYYY-YY (e.g., 2024-25)
+                    Please use format YYYY or YYYY-YY (e.g., 2024 or 2024-25)
                 </div>
             </div>
 
@@ -568,9 +717,11 @@
                 </div>
             </div>
 
-            <button type="submit" class="submit-btn">
-                <i class="fas fa-file-pdf"></i> Generate & Download PDF
-            </button>
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">
+                    <span>Download</span>
+                </button>
+            </div>
         </form>
     </div>
 
@@ -629,6 +780,10 @@
 
             // Validation rules
             const validationRules = {
+                pageTitle: {
+                    pattern: /^.{3,40}$/, 
+                    message: 'Please enter a page title (3-40 characters)'
+                },
                 subjectName: {
                     pattern: /^[A-Za-z0-9\s&()]{5,}$/,
                     message: 'Subject name must be at least 5 characters long'
@@ -646,8 +801,8 @@
                     message: 'Enter a valid department name'
                 },
                 studentName: {
-                    pattern: /^[A-Za-z\s]{3,}$/,
-                    message: 'Enter a valid name (letters and spaces only)'
+                    pattern: /^[A-Za-z\s\.]{3,}$/, 
+                    message: 'Enter a valid name (letters, spaces and periods only)'
                 },
                 rollNo: {
                     pattern: /^\d{1,12}$/,
@@ -658,8 +813,8 @@
                     message: 'Enter a valid branch name'
                 },
                 batch: {
-                    pattern: /^\d{4}-\d{2}$/,
-                    message: 'Use format YYYY-YY (e.g., 2024-25)'
+                    pattern: /^\d{4}(-\d{2})?$/, 
+                    message: 'Use format YYYY or YYYY-YY (e.g., 2024 or 2024-25)'
                 },
                 facultyName: {
                     pattern: /^[A-Za-z\s\.]{3,}$/,
@@ -679,6 +834,8 @@
                 input.addEventListener('input', () => validateField(input, validationRules[fieldId], errorElement));
                 input.addEventListener('blur', () => validateField(input, validationRules[fieldId], errorElement));
             });
+
+            // ...existing code...
 
             // Form submission handler with validation
             labManualForm.addEventListener('submit', function (e) {
@@ -731,10 +888,10 @@
 
             function showError(input, errorElement, message) {
                 input.classList.add('invalid');
-                input.classList.add('shake');
+                // No shake animation; keep the field red only
                 errorElement.textContent = message;
                 errorElement.classList.add('visible');
-                setTimeout(() => input.classList.remove('shake'), 500);
+                // No shake animation; keep the field red only
             }
 
             function hideError(input, errorElement) {
@@ -745,7 +902,8 @@
             function clearLocalStorage() {
                 const fields = [
                     'subjectName', 'subjectCode', 'semester', 'department',
-                    'studentName', 'rollNo', 'branch', 'batch',
+                        'studentName', 'rollNo', 'branch', 'batch',
+                        'pageTitle',
                     'facultyName', 'facultyDesignation'
                 ];
 
@@ -779,7 +937,7 @@
                     'Branch: ' + document.getElementById('branch').value;
 
                 document.getElementById('batch-value').textContent =
-                    'Batch: ' + document.getElementById('batch').value;
+                    'Batch: ' + computeDisplayBatch(document.getElementById('batch').value);
 
                 // Update faculty info
                 document.getElementById('faculty-name-value').textContent =
@@ -787,6 +945,24 @@
 
                 document.getElementById('faculty-designation-value').textContent =
                     document.getElementById('facultyDesignation').value;
+
+                // Update page title (top main title)
+                const pageTitleVal = document.getElementById('pageTitle').value || 'LAB MANUAL';
+                // set the visible main title in the preview
+                const mainTitleEl = document.querySelector('.main-title h2');
+                if (mainTitleEl) mainTitleEl.textContent = pageTitleVal;
+            }
+
+            // Helper to compute display form of batch: if user enters YYYY, return YYYY-YY
+            function computeDisplayBatch(raw) {
+                const value = (raw || '').trim();
+                if (/^\d{4}$/.test(value)) {
+                    const start = parseInt(value, 10);
+                    const end = ((start + 1) % 100).toString().padStart(2, '0');
+                    return `${value}-${end}`;
+                }
+                // If user already gave YYYY-YY or other allowed format, return as-is
+                return value;
             }
 
             function formatDepartment(dept) {
@@ -797,10 +973,52 @@
                 return dept;
             }
 
-            function showToast() {
-                toast.className = "show";
-                setTimeout(function () { toast.className = toast.className.replace("show", ""); }, 3000);
+            // New download overlay handling (replaces toast)
+            function showDownloadOverlay() {
+                const overlay = document.getElementById('download-overlay');
+                if (!overlay) return;
+                overlay.classList.add('download-open');
+                overlay.setAttribute('aria-hidden', 'false');
+                // trigger animated checkbar on the card
+                const card = overlay.querySelector('.download-card');
+                if (card) {
+                    // restart animation by removing and re-adding the class
+                    card.classList.remove('check-animate');
+                    // force reflow
+                    void card.offsetWidth;
+                    card.classList.add('check-animate');
+                }
             }
+
+            function hideDownloadOverlay() {
+                const overlay = document.getElementById('download-overlay');
+                if (!overlay) return;
+                // remove the open class to trigger fade-out animation
+                overlay.classList.remove('download-open');
+                overlay.setAttribute('aria-hidden', 'true');
+                // remove animation class so it can replay next time
+                const card = overlay.querySelector('.download-card');
+                if (card) {
+                    card.classList.remove('check-animate');
+                }
+            }
+
+            // close button wiring
+            document.addEventListener('click', function (e) {
+                if (e.target && e.target.id === 'close-download-overlay') {
+                    hideDownloadOverlay();
+                }
+            });
+
+            // Allow closing the download overlay with Escape key for accessibility
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    const overlay = document.getElementById('download-overlay');
+                    if (overlay && overlay.classList.contains('download-open')) {
+                        hideDownloadOverlay();
+                    }
+                }
+            });
 
             function generatePDF() {
                 const { jsPDF } = window.jspdf;
@@ -847,7 +1065,12 @@
 
                     // Get student name for filename
                     const studentName = document.getElementById('studentName').value || 'Student';
-                    const safeName = studentName.replace(/\s+/g, '_');
+                    // Keep letters, numbers and periods; replace other sequences with underscore.
+                    // Also remove any leading dots to avoid hidden files on some systems.
+                    const safeName = studentName.trim()
+                        .replace(/[^A-Za-z0-9\.]+/g, '_')
+                        .replace(/^_+|_+$/g, '')
+                        .replace(/^\.+/, '');
 
                     // Download the PDF
                     pdf.save(`KEC_Lab_Manual_${safeName}.pdf`);
@@ -855,8 +1078,8 @@
                     // Hide loading spinner
                     loadingSpinner.style.display = 'none';
 
-                    // Show success toast
-                    showToast();
+                    // Show success overlay
+                    showDownloadOverlay();
                 }).catch(error => {
                     console.error("Error generating PDF:", error);
                     loadingSpinner.style.display = 'none';
@@ -866,13 +1089,7 @@
         });
     </script>
 
-    <!-- Author & GitHub Section -->
-    <div style="text-align:center; margin-top:40px;">
-        <span style="font-size:18px; font-weight:bold; color:#333;">Created by Aryan S Rao</span>
-        <a href="https://github.com/aryansrao" target="_blank" style="margin-left:12px; color:#333; text-decoration:none;">
-            <i class="fab fa-github" style="font-size:28px; vertical-align:middle;"></i>
-        </a>
-    </div>
+    <!-- Author section removed per request -->
 </body>
 
 </html>

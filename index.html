@@ -129,11 +129,13 @@
         }
 
         input[type="text"],
-        input[type="number"] {
+        input[type="number"],
+        textarea,
+        select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 10px; /* more rounded corners */
             font-size: 16px;
             font-family: 'Inter', Arial, sans-serif;
         }
@@ -163,7 +165,8 @@
             gap: 8px;
             padding: 12px 28px;
             font-size: 16px;
-            margin: 20px auto 0 auto;
+            margin: 20px 0 0 0; /* remove auto margins so flex parent can center it */
+            align-self: center;
             width: auto;
             border-radius: 999px; /* pill */
             box-shadow: none;
@@ -171,6 +174,15 @@
 
         .submit-btn i {
             font-size: 20px;
+        }
+
+        /* Ensure the submit area is centered on all screen sizes (desktop + mobile) */
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 12px;
+            width: 100%;
         }
 
         /* Lab manual styles */
@@ -533,7 +545,9 @@
 
         /* Center only the submit button area */
         .form-actions {
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-top: 12px;
         }
             .header h1 {
@@ -595,6 +609,14 @@
 
         .site-footer a:hover {
             text-decoration: underline;
+        }
+
+        /* Make the submit button wider on desktop for better balance */
+        @media (min-width: 992px) {
+            .submit-btn {
+                padding: 14px 44px; /* wider left/right padding on desktop */
+                font-size: 17px;
+            }
         }
         </style>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">

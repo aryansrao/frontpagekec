@@ -454,23 +454,6 @@
             justify-content: center;
         }
 
-        .bar-track {
-            width: 80%;
-            height: 10px;
-            background: rgba(15,23,42,0.08);
-            border-radius: 999px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
-        }
-
-        .bar-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #34d399, #10b981);
-            border-radius: 999px;
-            transform-origin: left center;
-        }
-
         /* keyframes for filling the bar */
         @keyframes fillBar {
             from { width: 0%; }
@@ -605,9 +588,6 @@
             <div class="download-sub">Your PDF has been saved to your device.</div>
             <!-- Animated checkbar: fills, then checkmark pops in -->
             <div class="checkbar" aria-hidden="true">
-                <div class="bar-track">
-                    <div class="bar-fill"></div>
-                </div>
             </div>
             <button class="close-overlay" id="close-download-overlay">Close</button>
         </div>

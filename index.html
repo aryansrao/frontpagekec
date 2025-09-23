@@ -468,30 +468,11 @@
             font-size: 14px;
         }
 
-        /* Checkbar styles */
-        .checkbar {
-            margin: 18px 0 8px 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* keyframes for filling the bar */
-        @keyframes fillBar {
-            from { width: 0%; }
-            to { width: 100%; }
-        }
-
         /* pop animation for checkmark */
         @keyframes popCheck {
             0% { transform: scale(0.6); opacity: 0; }
             60% { transform: scale(1.12); opacity: 1; }
             100% { transform: scale(1); opacity: 1; }
-        }
-
-        /* When the card has the .check-animate class, play the fill then pop animations */
-        .download-card.check-animate .bar-fill {
-            animation: fillBar 760ms cubic-bezier(.2,.9,.2,1) forwards;
         }
 
         .download-card .checkmark {
@@ -505,9 +486,9 @@
             opacity: 0.0;
         }
 
-        /* pop the check after the fill completes (slight delay) */
+        /* pop the check shortly after overlay opens */
         .download-card.check-animate .checkmark {
-            animation: popCheck 320ms cubic-bezier(.2,.9,.2,1) 720ms both;
+            animation: popCheck 320ms cubic-bezier(.2,.9,.2,1) 220ms both;
         }
 
         /* Responsive styles */
@@ -636,13 +617,11 @@
 
     <!-- Download overlay (replaces toast notification) -->
     <div id="download-overlay" aria-hidden="true">
-        <div class="download-card" role="dialog" aria-modal="true" aria-labelledby="download-title">
+            <div class="download-card" role="dialog" aria-modal="true" aria-labelledby="download-title">
             <div class="checkmark">✓</div>
             <div id="download-title" class="download-msg">Download successful</div>
             <div class="download-sub">Your PDF has been saved to your device.</div>
-            <!-- Animated checkbar: fills, then checkmark pops in -->
-            <div class="checkbar" aria-hidden="true">
-            </div>
+            <!-- Check animation area (checkmark only) -->
             <button class="close-overlay" id="close-download-overlay">Close</button>
         </div>
     </div>
@@ -1164,47 +1143,32 @@
                 // Observe the download overlay open/close to play a short animation
                 const overlay = document.getElementById('download-overlay');
                 if (overlay) {
-                    const card = overlay.querySelector('.download-card');
-                    const barFillContainer = overlay.querySelector('.checkbar');
+                        const card = overlay.querySelector('.download-card');
 
-                    // ensure bar markup exists
-                    if (barFillContainer && !barFillContainer.querySelector('.bar-track')) {
-                        barFillContainer.innerHTML = '<div class="bar-track" style="width:80%;height:8px;background:#e6e6e6;border-radius:999px;overflow:hidden;"></div>';
-                        const track = barFillContainer.querySelector('.bar-track');
-                        const fill = document.createElement('div');
-                        fill.className = 'bar-fill';
-                        fill.style.cssText = 'height:100%;width:0%;background:#16a34a;border-radius:999px;transform-origin:left center;';
-                        track.appendChild(fill);
-                    }
-
-                    const obs = new MutationObserver(muts => {
-                        muts.forEach(m => {
-                            if (m.type === 'attributes' && m.attributeName === 'class') {
-                                const isOpen = overlay.classList.contains('download-open');
-                                if (isOpen) {
-                                    // show card with pop
-                                    if (card) {
-                                        gsap.fromTo(card, { y: 8, scale: 0.98, opacity: 0 }, { y:0, scale:1, opacity:1, duration: 0.32, ease: 'power3.out' });
+                        const obs = new MutationObserver(muts => {
+                            muts.forEach(m => {
+                                if (m.type === 'attributes' && m.attributeName === 'class') {
+                                    const isOpen = overlay.classList.contains('download-open');
+                                    if (isOpen) {
+                                        // show card with pop
+                                        if (card) {
+                                            gsap.fromTo(card, { y: 8, scale: 0.98, opacity: 0 }, { y:0, scale:1, opacity:1, duration: 0.32, ease: 'power3.out' });
+                                        }
+                                        // animate checkmark pop
+                                        const check = overlay.querySelector('.checkmark');
+                                        if (check) {
+                                            gsap.fromTo(check, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.36, ease: 'back.out(1.2)', delay: 0.22 });
+                                        }
+                                    } else {
+                                        // hide card
+                                        if (card) gsap.to(card, { opacity: 0, y: 6, duration: 0.22, ease: 'power1.in' });
+                                        const check = overlay.querySelector('.checkmark');
+                                        if (check) gsap.set(check, { scale: 0.85, opacity: 0 });
                                     }
-                                    // animate bar fill then pop check
-                                    const fill = overlay.querySelector('.bar-fill');
-                                    const check = overlay.querySelector('.checkmark');
-                                    if (fill) {
-                                        gsap.fromTo(fill, { width: '0%' }, { width: '100%', duration: 0.75, ease: 'power2.out' });
-                                    }
-                                    if (check) {
-                                        gsap.fromTo(check, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.36, ease: 'back.out(1.2)', delay: 0.7 });
-                                    }
-                                } else {
-                                    // hide card
-                                    if (card) gsap.to(card, { opacity: 0, y: 6, duration: 0.22, ease: 'power1.in' });
-                                    const fill = overlay.querySelector('.bar-fill');
-                                    if (fill) gsap.set(fill, { width: '0%' });
                                 }
-                            }
+                            });
                         });
-                    });
-                    obs.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+                        obs.observe(overlay, { attributes: true, attributeFilter: ['class'] });
                 }
             } catch (e) {
                 // don't break the app if GSAP is missing or errors

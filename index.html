@@ -5,6 +5,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KEC - Front page creator</title>
+    <!-- Silent one-time cleanup: unregister old service workers and clear caches so returning users get the latest UI -->
+    <script>
+    (function(){
+        try {
+            const FLAG = 'kec_pwa_cleanup_v3';
+            // If we've already run cleanup on this client, do nothing
+            if (localStorage.getItem(FLAG)) return;
+
+            // Only proceed if browser supports the APIs
+            if (!('serviceWorker' in navigator) && !('caches' in window)) return;
+
+            async function cleanup() {
+                let didSomething = false;
+                try {
+                    if ('serviceWorker' in navigator) {
+                        const regs = await navigator.serviceWorker.getRegistrations().catch(()=>[]);
+                        if (regs && regs.length) {
+                            didSomething = true;
+                            await Promise.all(regs.map(r => r.unregister().catch(()=>{})));
+                        }
+                        // best-effort: attempt to message controller
+                        try { if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage({type:'SKIP_WAITING'}); } catch(e){}
+                    }
+
+                    if ('caches' in window) {
+                        const keys = await caches.keys().catch(()=>[]);
+                        if (keys && keys.length) {
+                            didSomething = true;
+                            await Promise.all(keys.map(k => caches.delete(k).catch(()=>{})));
+                        }
+                    }
+                } catch (e) {
+                    // silent ignore
+                }
+
+                if (didSomething) {
+                    try { localStorage.setItem(FLAG, Date.now().toString()); } catch(e){}
+                    // reload once with a cache-busting param so browser fetches fresh assets
+                    try {
+                        const u = new URL(location.href);
+                        u.searchParams.set('_kec_cb', Date.now().toString());
+                        location.replace(u.toString());
+                    } catch (e) {
+                        try { location.reload(); } catch(e){}
+                    }
+                }
+            }
+
+            // run shortly after load (non-blocking)
+            setTimeout(cleanup, 40);
+        } catch (e) {
+            // swallow errors
+        }
+    })();
+    </script>
     <!-- Libraries for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>

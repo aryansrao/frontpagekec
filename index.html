@@ -5,58 +5,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KEC - Front page creator</title>
-    <!-- Silent one-time cleanup: unregister old service workers and clear caches so returning users get the latest UI -->
+    <!-- Per-reload silent cleanup: unregister service workers and clear Cache Storage on every load.
+         To avoid reload loops we add a temporary cache-busting param then remove it from history. -->
     <script>
     (function(){
         try {
-            const FLAG = 'kec_pwa_cleanup_v3';
-            // If we've already run cleanup on this client, do nothing
-            if (localStorage.getItem(FLAG)) return;
-
-            // Only proceed if browser supports the APIs
+            // If the browser doesn't support serviceWorker/caches, nothing to do
             if (!('serviceWorker' in navigator) && !('caches' in window)) return;
 
-            async function cleanup() {
-                let didSomething = false;
+            const CB_PARAM = '_kec_cb';
+            const urlObj = (() => { try { return new URL(location.href); } catch(e) { return null; } })();
+            const hasCb = urlObj ? urlObj.searchParams.has(CB_PARAM) : false;
+
+            async function cleanupOnce() {
                 try {
                     if ('serviceWorker' in navigator) {
                         const regs = await navigator.serviceWorker.getRegistrations().catch(()=>[]);
                         if (regs && regs.length) {
-                            didSomething = true;
                             await Promise.all(regs.map(r => r.unregister().catch(()=>{})));
                         }
-                        // best-effort: attempt to message controller
                         try { if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage({type:'SKIP_WAITING'}); } catch(e){}
                     }
 
                     if ('caches' in window) {
                         const keys = await caches.keys().catch(()=>[]);
                         if (keys && keys.length) {
-                            didSomething = true;
                             await Promise.all(keys.map(k => caches.delete(k).catch(()=>{})));
                         }
                     }
                 } catch (e) {
-                    // silent ignore
-                }
-
-                if (didSomething) {
-                    try { localStorage.setItem(FLAG, Date.now().toString()); } catch(e){}
-                    // reload once with a cache-busting param so browser fetches fresh assets
-                    try {
-                        const u = new URL(location.href);
-                        u.searchParams.set('_kec_cb', Date.now().toString());
-                        location.replace(u.toString());
-                    } catch (e) {
-                        try { location.reload(); } catch(e){}
-                    }
+                    // ignore failures
                 }
             }
 
-            // run shortly after load (non-blocking)
-            setTimeout(cleanup, 40);
-        } catch (e) {
-            // swallow errors
+            async function runCleanup() {
+                const did = await cleanupOnce();
+                try { console.info('kec: cleanup attempted'); } catch(e){}
+
+                // After attempting cleanup, force-refresh same-origin images and stylesheets by adding a cache-busting param.
+                function bustAssets() {
+                    try {
+                        const cb = Date.now().toString();
+                        const origin = location.origin;
+
+                        // Update <link rel=stylesheet> hrefs that are same-origin
+                        document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+                            try {
+                                const href = link.getAttribute('href');
+                                if (!href) return;
+                                const u = new URL(href, location.href);
+                                if (u.origin === origin) {
+                                    u.searchParams.set(CB_PARAM, cb);
+                                    link.setAttribute('href', u.toString());
+                                }
+                            } catch(e) {}
+                        });
+
+                        // Update same-origin images
+                        document.querySelectorAll('img').forEach(img => {
+                            try {
+                                const src = img.getAttribute('src');
+                                if (!src) return;
+                                const u = new URL(src, location.href);
+                                if (u.origin === origin) {
+                                    u.searchParams.set(CB_PARAM, cb);
+                                    img.setAttribute('src', u.toString());
+                                }
+                            } catch(e) {}
+                        });
+                    } catch(e) {}
+                }
+
+                // If the URL didn't have the cache-bust param, reload once with it so the browser fetches fresh assets.
+                // If it already had the param, remove it from history so the next manual reload will trigger cleanup again.
+                if (urlObj && !hasCb) {
+                    try {
+                        const u = new URL(location.href);
+                        u.searchParams.set(CB_PARAM, Date.now().toString());
+                        // reload to ensure index.html is fetched fresh (and then styles/images will be bust-refreshed)
+                        location.replace(u.toString());
+                        return;
+                    } catch (e) {
+                        try { location.reload(); return; } catch(e){}
+                    }
+                }
+
+                // If url already had cache-bust param, remove it from address bar and update assets in-place
+                if (urlObj && hasCb) {
+                    try {
+                        const u = new URL(location.href);
+                        u.searchParams.delete(CB_PARAM);
+                        history.replaceState({}, document.title, u.pathname + u.search + u.hash);
+                    } catch(e) {}
+                    // force update same-origin assets without further reload
+                    bustAssets();
+                }
+            }
+
+            // Run shortly after DOMContentLoaded to avoid blocking parsing.
+            if (document.readyState === 'loading') {
+                window.addEventListener('DOMContentLoaded', () => setTimeout(runCleanup, 40));
+            } else {
+                setTimeout(runCleanup, 40);
+            }
+        } catch(e) {
+            // swallow
         }
     })();
     </script>

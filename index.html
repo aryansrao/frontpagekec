@@ -400,16 +400,42 @@
             opacity: 1;
         }
 
+        /* Animated check container (uses inline SVG for crisp stroke animation) */
         .download-card .checkmark {
             width: 96px;
             height: 96px;
-            border-radius: 50%;
-            background: #16a34a; /* green */
-            color: white;
-            font-size: 56px;
-            line-height: 96px;
             margin: 0 auto 16px auto;
-            box-shadow: 0 6px 18px rgba(22,163,74,0.35);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(180deg,#16a34a,#0ea45a);
+            box-shadow: 0 10px 28px rgba(16,148,69,0.22), 0 4px 10px rgba(16,148,69,0.12) inset;
+            transform: scale(0.85);
+            position: relative;
+            overflow: visible;
+            opacity: 0;
+            transition: transform 220ms ease-out, opacity 220ms ease-out;
+        }
+
+        .download-card .checkmark svg {
+            width: 56px;
+            height: 56px;
+            display: block;
+        }
+
+        .download-card .checkmark .check-circle {
+            fill: transparent;
+        }
+
+        .download-card .checkmark .check-path {
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
         }
 
         .download-card .download-msg {
@@ -458,20 +484,44 @@
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .download-card .checkmark {
-            display: inline-block;
-            width: 96px;
-            height: 96px;
-            line-height: 96px;
-            font-size: 56px;
-            transition: transform 220ms ease-out, opacity 220ms ease-out;
-            transform: scale(0.85);
-            opacity: 0.0;
+        /* pop the check and draw the tick when .check-animate is added to the card */
+        .download-card.check-animate .checkmark {
+            opacity: 1;
+            transform: scale(1);
+            animation: popCheck 340ms cubic-bezier(.2,.9,.2,1) both;
         }
 
-        /* pop the check shortly after overlay opens */
-        .download-card.check-animate .checkmark {
-            animation: popCheck 320ms cubic-bezier(.2,.9,.2,1) 220ms both;
+        /* animate the stroke draw slightly after the pop */
+        .download-card.check-animate .checkmark .check-path {
+            animation: drawCheck 420ms cubic-bezier(.2,.9,.2,1) 140ms both;
+        }
+
+        /* subtle ring glow pulse */
+        .download-card.check-animate .checkmark::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            box-shadow: 0 8px 30px rgba(16,148,69,0.16);
+            opacity: 0.0;
+            z-index: -1; /* keep glow behind the check */
+            animation: ringPulse 520ms ease-out 120ms both;
+        }
+
+        @keyframes drawCheck {
+            0% { stroke-dashoffset: 100; }
+            60% { stroke-dashoffset: 18; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        @keyframes ringPulse {
+            0% { opacity: 0; transform: scale(0.9); }
+            50% { opacity: 0.45; transform: scale(1.03); }
+            100% { opacity: 0; transform: scale(1.12); }
         }
 
         /* Responsive styles */
@@ -593,7 +643,13 @@
         <div class="download-card" role="dialog" aria-modal="true" aria-labelledby="download-title">
             <!-- Success state (shown after file has been saved) -->
             <div class="overlay-success" aria-hidden="true">
-                <div class="checkmark">✓</div>
+                <div class="checkmark" aria-hidden="true">
+                    <!-- Animated SVG check: circle + path. Path will be stroke-animated. -->
+                    <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+                        <circle class="check-circle" cx="32" cy="32" r="30" stroke-width="0"></circle>
+                        <path class="check-path" d="M18 34 L28 44 L46 22" />
+                    </svg>
+                </div>
                 <div id="download-title" class="download-msg">Download successful</div>
                 <div class="download-sub">Your PDF has been saved to your device.</div>
             </div>
@@ -1121,11 +1177,7 @@
                                         if (card) {
                                             gsap.fromTo(card, { y: 8, scale: 0.98, opacity: 0 }, { y:0, scale:1, opacity:1, duration: 0.32, ease: 'power3.out' });
                                         }
-                                        // animate checkmark pop
-                                        const check = overlay.querySelector('.checkmark');
-                                        if (check) {
-                                            gsap.fromTo(check, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.36, ease: 'back.out(1.2)', delay: 0.22 });
-                                        }
+                                        // checkmark animation is handled by CSS (stroke draw + pop)
                                     } else {
                                         // hide card
                                         if (card) gsap.to(card, { opacity: 0, y: 6, duration: 0.22, ease: 'power1.in' });

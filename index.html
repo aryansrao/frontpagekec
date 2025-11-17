@@ -748,50 +748,184 @@
             text-decoration: underline;
         }
 
-        /* Dark Mode Toggle Button */
-        .theme-toggle {
+        /* Dropdown Menu */
+        .dropdown {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: var(--button-bg);
-            border: none;
-            border-radius: 50px;
-            width: 60px;
-            height: 32px;
+            top: -50vh;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            background: var(--bg-secondary);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            padding: 40px 20px;
+            will-change: transform;
+            transition: background-color 0.4s ease;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .dropdown__section {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .dropdown__section--one {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .dropdown__word {
+            font-size: 8vw;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin: 0;
+            color: var(--text-primary);
+            transition: color 0.4s ease;
+        }
+
+        .dropdown__quote {
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 14px;
+            text-align: right;
+            max-width: 300px;
+            color: var(--text-secondary);
+            transition: color 0.4s ease;
+        }
+
+        .dropdown__section--three {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .divider {
+            width: 0;
+            height: 1px;
+            background-color: var(--input-border);
+            transition: width 0.4s ease, background-color 0.4s ease;
+            will-change: width;
+        }
+
+        .dropdown__nav {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .dropdown__button {
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 18px;
+            color: var(--text-primary);
             cursor: pointer;
+            transition: color 0.3s ease, transform 0.2s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            will-change: opacity, transform;
+        }
+
+        .dropdown__button:hover {
+            color: var(--button-bg);
+            transform: translateY(-2px);
+        }
+
+        /* Theme toggle inside dropdown */
+        .theme-toggle-dropdown {
             display: flex;
             align-items: center;
-            padding: 4px;
-            transition: background-color 0.4s ease;
-            box-shadow: 0 4px 12px var(--shadow);
+            gap: 10px;
+            margin-left: auto;
+            opacity: 0;
+            transform: translateY(20px);
+            will-change: opacity, transform;
         }
 
-        .theme-toggle:hover {
-            background: var(--button-hover);
-            transform: scale(1.05);
+        .theme-toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: var(--input-border);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
-        .theme-toggle-icon {
-            width: 24px;
-            height: 24px;
+        .theme-toggle-switch:hover {
+            background: var(--button-bg);
+        }
+
+        .theme-toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
             background: white;
             border-radius: 50%;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 12px;
+        }
+
+        [data-theme="dark"] .theme-toggle-slider {
+            transform: translateX(24px);
+        }
+
+        .theme-label {
+            font-family: 'Inter', Arial, sans-serif;
             font-size: 14px;
+            color: var(--text-secondary);
+            transition: color 0.4s ease;
         }
 
-        [data-theme="dark"] .theme-toggle-icon {
-            transform: translateX(28px);
+        /* Animation states */
+        .dropdown.open .dropdown__word,
+        .dropdown.open .dropdown__quote,
+        .dropdown.open .dropdown__button,
+        .dropdown.open .theme-toggle-dropdown {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .theme-toggle-icon::before {
-            transition: opacity 0.3s ease;
+        .dropdown__word,
+        .dropdown__quote {
+            opacity: 0;
+            transform: translateY(20px);
+            will-change: opacity, transform;
         }
 
+
+        /* Blur backdrop when menu is open */
+        .menu-backdrop-blur {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 998;
+        }
+
+        .menu-backdrop-blur.active {
+            opacity: 1;
+        }
+
+        /* Ensure dropdown is above blur */
+        .dropdown {
+            z-index: 999;
+        }
 
         /* Download overlay dark mode adjustments */
         #download-overlay {
@@ -858,10 +992,31 @@
 </head>
 
 <body>
-    <!-- Dark Mode Toggle -->
-    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
-        <div class="theme-toggle-icon"></div>
-    </button>
+    <!-- Blur backdrop for menu -->
+    <div class="menu-backdrop-blur" id="menu-backdrop"></div>
+
+    <!-- Dropdown Menu -->
+    <div class="dropdown" id="dropdown">
+        <div class="dropdown__section dropdown__section--one">
+            <h1 class="dropdown__word">PROJECT</h1>
+            <p class="dropdown__quote">Generate your perfect front page in seconds.</p>
+        </div>
+
+        <div class="dropdown__section dropdown__section--three">
+            <div class="divider"></div>
+            <div class="dropdown__nav">
+                <a class="dropdown__button" href="https://github.com/aryansrao/" target="_blank">Github</a>
+                <a class="dropdown__button" href="https://github.com/aryansrao/frontpagekec" target="_blank">This repo</a>
+                <a class="dropdown__button" href="https://aryansrao.github.io" target="_blank">Author</a>
+                <div class="theme-toggle-dropdown">
+                    <span class="theme-label">Dark Mode</span>
+                    <div class="theme-toggle-switch" id="theme-toggle">
+                        <div class="theme-toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div id="bottomBlur"></div>
 
 
@@ -1045,27 +1200,268 @@
     </div>
 
     <script>
-        // Dark Mode Toggle Handler
+        // Menu and Dark Mode Handler
         document.addEventListener('DOMContentLoaded', function () {
+            const dropdown = document.getElementById('dropdown');
+            const formSection = document.getElementById('form-section');
             const themeToggle = document.getElementById('theme-toggle');
+            const menuBackdrop = document.getElementById('menu-backdrop');
+            const kecLogo = document.querySelector('.kec-logo-img');
             const html = document.documentElement;
+            let isMenuOpen = false;
+            let touchStartY = 0;
+            let touchCurrentY = 0;
+            let isDragging = false;
+            let isAnimating = false;
 
             // Check for saved theme preference or default to light
             const savedTheme = localStorage.getItem('theme') || 'light';
             html.setAttribute('data-theme', savedTheme);
 
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = html.getAttribute('data-theme');
-                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            // Add click handler for KEC logo to open/close menu
+            if (kecLogo) {
+                kecLogo.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (isMenuOpen) {
+                        closeMenu();
+                    } else {
+                        openMenu();
+                    }
+                });
+                // Add cursor pointer to logo
+                kecLogo.style.cursor = 'pointer';
+            }
 
-                html.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
+            // Theme toggle functionality
+            if (themeToggle) {
+                themeToggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const currentTheme = html.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
 
-                // Add a subtle pulse animation
-                themeToggle.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    themeToggle.style.transform = 'scale(1)';
-                }, 100);
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+            }
+
+            // Function to open menu
+            function openMenu() {
+                if (isMenuOpen || isAnimating) return;
+                isAnimating = true;
+                
+                // Reset all menu elements to initial hidden state before animating
+                gsap.set('.dropdown__word, .dropdown__quote', {
+                    opacity: 0,
+                    y: 20
+                });
+                gsap.set('.dropdown__button, .theme-toggle-dropdown', {
+                    opacity: 0,
+                    y: 20
+                });
+                gsap.set('.divider', {
+                    width: '0%'
+                });
+                
+                const openTimeline = gsap.timeline({
+                    onComplete: () => {
+                        isAnimating = false;
+                    }
+                });
+
+                openTimeline
+                    .to([dropdown, formSection], {
+                        y: '50vh',
+                        duration: 0.4,
+                        ease: 'power3.out'
+                    })
+                    .to('.dropdown__word', {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.4,
+                        ease: 'power3.out'
+                    }, '-=0.3')
+                    .to('.dropdown__quote', {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.4,
+                        ease: 'power3.out'
+                    }, '-=0.2')
+                    .to('.dropdown__button, .theme-toggle-dropdown', {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.3,
+                        stagger: 0.1,
+                        ease: 'power3.out'
+                    }, '-=0.2')
+                    .to('.divider', {
+                        width: '100%',
+                        duration: 0.4,
+                        ease: 'power3.out'
+                    }, '-=0.4');
+
+                dropdown.classList.add('open');
+                menuBackdrop.classList.add('active');
+                isMenuOpen = true;
+            }
+
+            // Function to close menu
+            function closeMenu() {
+                if (!isMenuOpen || isAnimating) return;
+                isAnimating = true;
+                
+                menuBackdrop.classList.remove('active');
+                
+                const closeTimeline = gsap.timeline({
+                    onComplete: () => {
+                        dropdown.classList.remove('open');
+                        isMenuOpen = false;
+                        isAnimating = false;
+                    }
+                });
+
+                closeTimeline
+                    .to('.dropdown__button, .theme-toggle-dropdown', {
+                        opacity: 0,
+                        y: 20,
+                        duration: 0.3,
+                        stagger: 0.05,
+                        ease: 'power2.in'
+                    })
+                    .to('.dropdown__quote', {
+                        opacity: 0,
+                        y: 20,
+                        duration: 0.3,
+                        ease: 'power2.in'
+                    }, '-=0.1')
+                    .to('.dropdown__word', {
+                        opacity: 0,
+                        y: 20,
+                        duration: 0.3,
+                        ease: 'power2.in'
+                    }, '-=0.1')
+                    .to('.divider', {
+                        width: '0%',
+                        duration: 0.4,
+                        ease: 'power2.in'
+                    })
+                    .to([dropdown, formSection], {
+                        y: '0',
+                        duration: 0.4,
+                        ease: 'power2.in',
+                        clearProps: 'transform'
+                    });
+            }
+
+            // Drag-down gesture to open menu (works anywhere on screen)
+            let dragThreshold = 100;
+
+            document.addEventListener('touchstart', (e) => {
+                // Only allow drag if at top of page, menu not open, and not clicking on dropdown content
+                if (window.scrollY === 0 && !isMenuOpen && !dropdown.contains(e.target)) {
+                    touchStartY = e.touches[0].clientY;
+                    isDragging = true;
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchmove', (e) => {
+                if (isDragging && !isMenuOpen) {
+                    touchCurrentY = e.touches[0].clientY;
+                    const dragDistance = touchCurrentY - touchStartY;
+
+                    if (dragDistance > 0) {
+                        const progress = Math.min(dragDistance / dragThreshold, 1);
+                        gsap.to([dropdown, formSection], {
+                            y: progress * window.innerHeight * 0.5,
+                            duration: 0.1,
+                            ease: 'none',
+                            overwrite: 'auto'
+                        });
+                    }
+                }
+            }, { passive: true });
+
+            document.addEventListener('touchend', () => {
+                if (isDragging && !isMenuOpen) {
+                    const dragDistance = touchCurrentY - touchStartY;
+
+                    if (dragDistance >= dragThreshold) {
+                        openMenu();
+                    } else {
+                        gsap.to([dropdown, formSection], {
+                            y: 0,
+                            duration: 0.3,
+                            ease: 'power2.out',
+                            clearProps: 'transform'
+                        });
+                    }
+
+                    isDragging = false;
+                    touchStartY = 0;
+                    touchCurrentY = 0;
+                }
+            });
+
+            // Mouse drag for desktop
+            let mouseDown = false;
+            let mouseStartY = 0;
+
+            document.addEventListener('mousedown', (e) => {
+                // Only allow if at top, menu closed, clicking on formSection (not dropdown content)
+                if (window.scrollY === 0 && !isMenuOpen && !dropdown.contains(e.target) && e.clientY < 150) {
+                    mouseStartY = e.clientY;
+                    mouseDown = true;
+                    e.preventDefault();
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (mouseDown && !isMenuOpen) {
+                    const dragDistance = e.clientY - mouseStartY;
+
+                    if (dragDistance > 0) {
+                        const progress = Math.min(dragDistance / dragThreshold, 1);
+                        gsap.to([dropdown, formSection], {
+                            y: progress * window.innerHeight * 0.5,
+                            duration: 0.1,
+                            ease: 'none',
+                            overwrite: 'auto'
+                        });
+                    }
+                }
+            });
+
+            document.addEventListener('mouseup', (e) => {
+                if (mouseDown && !isMenuOpen) {
+                    const dragDistance = e.clientY - mouseStartY;
+
+                    if (dragDistance >= dragThreshold) {
+                        openMenu();
+                    } else {
+                        gsap.to([dropdown, formSection], {
+                            y: 0,
+                            duration: 0.3,
+                            ease: 'power2.out',
+                            clearProps: 'transform'
+                        });
+                    }
+
+                    mouseDown = false;
+                }
+            });
+
+            // Click outside dropdown to close (with proper event handling)
+            document.addEventListener('mousedown', (e) => {
+                if (isMenuOpen && !dropdown.contains(e.target) && !isAnimating) {
+                    e.preventDefault();
+                    closeMenu();
+                }
+            });
+
+            // ESC key to close
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && isMenuOpen) {
+                    closeMenu();
+                }
             });
         });
 

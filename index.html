@@ -9,7 +9,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    
+
     <!-- Libraries for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -57,7 +57,8 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
-        html, body {
+        html,
+        body {
             background-color: var(--bg-primary);
             padding: 20px;
             min-height: 100vh;
@@ -76,7 +77,8 @@
             border-radius: 0;
             box-shadow: none;
             border: none;
-            flex: 1 1 auto; /* allow main container to grow so footer sits at the bottom */
+            flex: 1 1 auto;
+            /* allow main container to grow so footer sits at the bottom */
         }
 
         h1,
@@ -90,7 +92,8 @@
         .kec-logo-text {
             font-family: 'Bebas Neue', Arial, sans-serif;
             font-size: 48px;
-            color: #2b6cb0; /* cool blue accent, change if you want */
+            color: #2b6cb0;
+            /* cool blue accent, change if you want */
             letter-spacing: 1px;
             display: inline-block;
             line-height: 1;
@@ -187,13 +190,26 @@
         /* Placeholder typography to match labels (minimalistic) */
         input::placeholder {
             font-family: 'Inter', Arial, sans-serif;
-            color: #9CA3AF; /* subdued gray */
+            color: #9CA3AF;
+            /* subdued gray */
             font-weight: 400;
         }
-        input::-webkit-input-placeholder { font-family: 'Inter', Arial, sans-serif; }
-        input::-moz-placeholder { font-family: 'Inter', Arial, sans-serif; }
-        input:-ms-input-placeholder { font-family: 'Inter', Arial, sans-serif; }
-        input:-moz-placeholder { font-family: 'Inter', Arial, sans-serif; }
+
+        input::-webkit-input-placeholder {
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        input::-moz-placeholder {
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        input:-ms-input-placeholder {
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        input:-moz-placeholder {
+            font-family: 'Inter', Arial, sans-serif;
+        }
 
         input[type="text"]:focus,
         input[type="number"]:focus {
@@ -209,10 +225,12 @@
             gap: 8px;
             padding: 12px 28px;
             font-size: 16px;
-            margin: 20px 0 0 0; /* remove auto margins so flex parent can center it */
+            margin: 20px 0 0 0;
+            /* remove auto margins so flex parent can center it */
             align-self: center;
             width: auto;
-            border-radius: 999px; /* pill */
+            border-radius: 999px;
+            /* pill */
             box-shadow: none;
         }
 
@@ -426,7 +444,7 @@
             position: fixed;
             inset: 0;
             /* semi-transparent dark layer plus backdrop blur for frosted/blurred background */
-            background: rgba(0,0,0,0.38);
+            background: rgba(0, 0, 0, 0.38);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
             z-index: 1002;
@@ -437,7 +455,7 @@
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
-            transition: opacity 260ms cubic-bezier(.2,.9,.2,1), visibility 260ms step-end;
+            transition: opacity 260ms cubic-bezier(.2, .9, .2, 1), visibility 260ms step-end;
         }
 
         /* When open, make overlay visible and interactive */
@@ -445,7 +463,7 @@
             opacity: 1;
             visibility: visible;
             pointer-events: auto;
-            transition: opacity 260ms cubic-bezier(.2,.9,.2,1), visibility 0ms;
+            transition: opacity 260ms cubic-bezier(.2, .9, .2, 1), visibility 0ms;
         }
 
         .download-card {
@@ -453,13 +471,13 @@
             border-radius: 12px;
             padding: 28px 36px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             max-width: 420px;
             width: 90%;
             /* start slightly lowered and scaled down for subtle motion */
             transform: translateY(8px) scale(0.98);
             opacity: 0;
-            transition: transform 260ms cubic-bezier(.2,.9,.2,1), opacity 260ms cubic-bezier(.2,.9,.2,1);
+            transition: transform 260ms cubic-bezier(.2, .9, .2, 1), opacity 260ms cubic-bezier(.2, .9, .2, 1);
         }
 
         /* When overlay is open, animate the card to full opacity/position */
@@ -477,8 +495,8 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            background: linear-gradient(180deg,#16a34a,#0ea45a);
-            box-shadow: 0 10px 28px rgba(16,148,69,0.22), 0 4px 10px rgba(16,148,69,0.12) inset;
+            background: linear-gradient(180deg, #16a34a, #0ea45a);
+            box-shadow: 0 10px 28px rgba(16, 148, 69, 0.22), 0 4px 10px rgba(16, 148, 69, 0.12) inset;
             transform: scale(0.85);
             position: relative;
             overflow: visible;
@@ -547,21 +565,32 @@
 
         /* pop animation for checkmark */
         @keyframes popCheck {
-            0% { transform: scale(0.6); opacity: 0; }
-            60% { transform: scale(1.12); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
+            0% {
+                transform: scale(0.6);
+                opacity: 0;
+            }
+
+            60% {
+                transform: scale(1.12);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         /* pop the check and draw the tick when .check-animate is added to the card */
         .download-card.check-animate .checkmark {
             opacity: 1;
             transform: scale(1);
-            animation: popCheck 340ms cubic-bezier(.2,.9,.2,1) both;
+            animation: popCheck 340ms cubic-bezier(.2, .9, .2, 1) both;
         }
 
         /* animate the stroke draw slightly after the pop */
         .download-card.check-animate .checkmark .check-path {
-            animation: drawCheck 420ms cubic-bezier(.2,.9,.2,1) 140ms both;
+            animation: drawCheck 420ms cubic-bezier(.2, .9, .2, 1) 140ms both;
         }
 
         /* subtle ring glow pulse */
@@ -574,22 +603,42 @@
             width: 140px;
             height: 140px;
             border-radius: 50%;
-            box-shadow: 0 8px 30px rgba(16,148,69,0.16);
+            box-shadow: 0 8px 30px rgba(16, 148, 69, 0.16);
             opacity: 0.0;
-            z-index: -1; /* keep glow behind the check */
+            z-index: -1;
+            /* keep glow behind the check */
             animation: ringPulse 520ms ease-out 120ms both;
         }
 
         @keyframes drawCheck {
-            0% { stroke-dashoffset: 100; }
-            60% { stroke-dashoffset: 18; }
-            100% { stroke-dashoffset: 0; }
+            0% {
+                stroke-dashoffset: 100;
+            }
+
+            60% {
+                stroke-dashoffset: 18;
+            }
+
+            100% {
+                stroke-dashoffset: 0;
+            }
         }
 
         @keyframes ringPulse {
-            0% { opacity: 0; transform: scale(0.9); }
-            50% { opacity: 0.45; transform: scale(1.03); }
-            100% { opacity: 0; transform: scale(1.12); }
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            50% {
+                opacity: 0.45;
+                transform: scale(1.03);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.12);
+            }
         }
 
         /* Responsive styles */
@@ -627,13 +676,14 @@
             }
 
 
-        /* Center only the submit button area */
-        .form-actions {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 12px;
-        }
+            /* Center only the submit button area */
+            .form-actions {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 12px;
+            }
+
             .header h1 {
                 font-size: 24px;
             }
@@ -661,8 +711,10 @@
             height: 297mm;
             overflow: hidden;
         }
+
         /* Respect users who prefer reduced motion: disable overlay/card transitions */
         @media (prefers-reduced-motion: reduce) {
+
             #download-overlay,
             .download-card {
                 transition: none !important;
@@ -670,6 +722,7 @@
                 animation: none !important;
             }
         }
+
         /* Small footer that sits at the end of document flow (not an overlay) */
         .site-footer {
             position: relative;
@@ -747,7 +800,7 @@
 
         .download-card {
             background: var(--card-bg);
-            transition: background-color 0.4s ease, transform 260ms cubic-bezier(.2,.9,.2,1), opacity 260ms cubic-bezier(.2,.9,.2,1);
+            transition: background-color 0.4s ease, transform 260ms cubic-bezier(.2, .9, .2, 1), opacity 260ms cubic-bezier(.2, .9, .2, 1);
         }
 
         .download-card .download-msg {
@@ -769,14 +822,37 @@
             background: var(--button-hover);
         }
 
+        /* Bottom Blur Bar */
+        #bottomBlur {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: linear-gradient(180deg,
+                    rgba(255, 255, 255, 0.06) 0%,
+                    rgba(255, 255, 255, 0.04) 35%,
+                    rgba(255, 255, 255, 0.02) 60%,
+                    transparent 100%);
+            backdrop-filter: blur(10px) saturate(120%);
+            -webkit-backdrop-filter: blur(10px) saturate(120%);
+            pointer-events: none;
+            z-index: 1000;
+            mask-image: linear-gradient(to top, black 0%, black 8%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to top, black 0%, black 8%, transparent 100%);
+            border-top: 1px solid rgba(44, 36, 22, 0.04);
+            box-shadow: 0 -8px 24px rgba(44, 36, 22, 0.06);
+        }
+
         /* Make the submit button wider on desktop for better balance */
         @media (min-width: 992px) {
             .submit-btn {
-                padding: 14px 44px; /* wider left/right padding on desktop */
+                padding: 14px 44px;
+                /* wider left/right padding on desktop */
                 font-size: 17px;
             }
         }
-        </style>
+    </style>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -786,6 +862,8 @@
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
         <div class="theme-toggle-icon"></div>
     </button>
+    <div id="bottomBlur"></div>
+
 
     <!-- Download overlay: only show success state after PDF save -->
     <div id="download-overlay" aria-hidden="true">
@@ -807,11 +885,12 @@
         </div>
     </div>
 
-    
+
 
     <!-- Form Section -->
     <div class="container" id="form-section">
-    <h1 class="form-title"><img src="keclogo.jpg" alt="KEC Logo" class="kec-logo-img"> <span class="form-title-text">Front page Creator</span></h1>
+        <h1 class="form-title"><img src="keclogo.jpg" alt="KEC Logo" class="kec-logo-img"> <span
+                class="form-title-text">Front page Creator</span></h1>
         <h3 class="form-subtitle">Fill in the details to generate and download your front page</h3>
 
         <div class="form-group">
@@ -860,7 +939,8 @@
             <div class="form-group">
                 <label for="studentName">Student Name:</label>
                 <input type="text" id="studentName" name="studentName" placeholder="Enter your full name"
-                    pattern="[A-Za-z\s\.]+" title="Please enter only letters, spaces and periods" maxlength="50" required>
+                    pattern="[A-Za-z\s\.]+" title="Please enter only letters, spaces and periods" maxlength="50"
+                    required>
                 <div class="error-message" id="studentName-error">
                     Please enter a valid name (letters, spaces and periods only)
                 </div>
@@ -966,21 +1046,21 @@
 
     <script>
         // Dark Mode Toggle Handler
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const themeToggle = document.getElementById('theme-toggle');
             const html = document.documentElement;
-            
+
             // Check for saved theme preference or default to light
             const savedTheme = localStorage.getItem('theme') || 'light';
             html.setAttribute('data-theme', savedTheme);
-            
+
             themeToggle.addEventListener('click', () => {
                 const currentTheme = html.getAttribute('data-theme');
                 const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                
+
                 html.setAttribute('data-theme', newTheme);
                 localStorage.setItem('theme', newTheme);
-                
+
                 // Add a subtle pulse animation
                 themeToggle.style.transform = 'scale(0.95)';
                 setTimeout(() => {
@@ -1002,7 +1082,7 @@
             // Validation rules
             const validationRules = {
                 pageTitle: {
-                    pattern: /^.{3,40}$/, 
+                    pattern: /^.{3,40}$/,
                     message: 'Please enter a page title (3-40 characters)'
                 },
                 subjectName: {
@@ -1022,7 +1102,7 @@
                     message: 'Enter a valid department name'
                 },
                 studentName: {
-                    pattern: /^[A-Za-z\s\.]{3,}$/, 
+                    pattern: /^[A-Za-z\s\.]{3,}$/,
                     message: 'Enter a valid name (letters, spaces and periods only)'
                 },
                 rollNo: {
@@ -1034,7 +1114,7 @@
                     message: 'Enter a valid branch name'
                 },
                 batch: {
-                    pattern: /^\d{4}(-\d{2})?$/, 
+                    pattern: /^\d{4}(-\d{2})?$/,
                     message: 'Use format YYYY or YYYY-YY (e.g., 2024 or 2024-25)'
                 },
                 facultyName: {
@@ -1120,8 +1200,8 @@
             function clearLocalStorage() {
                 const fields = [
                     'subjectName', 'subjectCode', 'semester', 'department',
-                        'studentName', 'rollNo', 'branch', 'batch',
-                        'pageTitle',
+                    'studentName', 'rollNo', 'branch', 'batch',
+                    'pageTitle',
                     'facultyName', 'facultyDesignation'
                 ];
 
@@ -1222,7 +1302,7 @@
                 }
             });
 
-            
+
 
             function generatePDF() {
                 const { jsPDF } = window.jspdf;
@@ -1279,20 +1359,20 @@
                     // Download the PDF
                     pdf.save(`KEC_Lab_Manual_${safeName}.pdf`);
 
-                        // Open the overlay and show the success state
-                        const overlayEl = document.getElementById('download-overlay');
-                        if (overlayEl) {
-                            overlayEl.classList.add('download-open');
-                            overlayEl.setAttribute('aria-hidden', 'false');
-                            const card = overlayEl.querySelector('.download-card');
-                            if (card) {
-                                card.classList.add('success-state');
-                                // trigger the checkmark animation class
-                                card.classList.remove('check-animate');
-                                void card.offsetWidth;
-                                card.classList.add('check-animate');
-                            }
+                    // Open the overlay and show the success state
+                    const overlayEl = document.getElementById('download-overlay');
+                    if (overlayEl) {
+                        overlayEl.classList.add('download-open');
+                        overlayEl.setAttribute('aria-hidden', 'false');
+                        const card = overlayEl.querySelector('.download-card');
+                        if (card) {
+                            card.classList.add('success-state');
+                            // trigger the checkmark animation class
+                            card.classList.remove('check-animate');
+                            void card.offsetWidth;
+                            card.classList.add('check-animate');
                         }
+                    }
                 }).catch(error => {
                     console.error("Error generating PDF:", error);
                     // close the overlay if open
@@ -1308,38 +1388,38 @@
     <div class="site-footer">
         Built by <a href="https://aryansrao.github.io" target="_blank" rel="noopener noreferrer">Aryan</a>
     </div>
-    
+
     <!-- GSAP animations: entrance, button interactions, overlay animations -->
     <script>
-    (function(){
-        // Wait for DOM ready
-        document.addEventListener('DOMContentLoaded', () => {
-            try {
-                // Entrance: container and form groups
-                gsap.from('.container', { duration: 0.6, y: 16, opacity: 0, ease: 'power3.out' });
+        (function () {
+            // Wait for DOM ready
+            document.addEventListener('DOMContentLoaded', () => {
+                try {
+                    // Entrance: container and form groups
+                    gsap.from('.container', { duration: 0.6, y: 16, opacity: 0, ease: 'power3.out' });
 
-                const groups = document.querySelectorAll('.form-group');
-                if (groups.length) {
-                    gsap.from(groups, { duration: 0.6, y: 10, opacity: 0, stagger: 0.06, delay: 0.12, ease: 'power3.out' });
-                }
+                    const groups = document.querySelectorAll('.form-group');
+                    if (groups.length) {
+                        gsap.from(groups, { duration: 0.6, y: 10, opacity: 0, stagger: 0.06, delay: 0.12, ease: 'power3.out' });
+                    }
 
-                // Logo subtle pop
-                const logo = document.querySelector('.kec-logo-img');
-                if (logo) gsap.from(logo, { duration: 0.6, scale: 0.96, opacity: 0, delay: 0.05, ease: 'back.out(1.1)'});
+                    // Logo subtle pop
+                    const logo = document.querySelector('.kec-logo-img');
+                    if (logo) gsap.from(logo, { duration: 0.6, scale: 0.96, opacity: 0, delay: 0.05, ease: 'back.out(1.1)' });
 
-                // Button hover and tap interactions
-                const btn = document.querySelector('.submit-btn');
-                if (btn) {
-                    btn.addEventListener('mouseenter', () => gsap.to(btn, { scale: 1.03, duration: 0.16, ease: 'power1.out' }));
-                    btn.addEventListener('mouseleave', () => gsap.to(btn, { scale: 1, duration: 0.22, ease: 'power1.out' }));
-                    // mobile/tap feedback
-                    btn.addEventListener('pointerdown', () => gsap.to(btn, { scale: 0.98, duration: 0.06 }));
-                    btn.addEventListener('pointerup', () => gsap.to(btn, { scale: 1.03, duration: 0.08 }));
-                }
+                    // Button hover and tap interactions
+                    const btn = document.querySelector('.submit-btn');
+                    if (btn) {
+                        btn.addEventListener('mouseenter', () => gsap.to(btn, { scale: 1.03, duration: 0.16, ease: 'power1.out' }));
+                        btn.addEventListener('mouseleave', () => gsap.to(btn, { scale: 1, duration: 0.22, ease: 'power1.out' }));
+                        // mobile/tap feedback
+                        btn.addEventListener('pointerdown', () => gsap.to(btn, { scale: 0.98, duration: 0.06 }));
+                        btn.addEventListener('pointerup', () => gsap.to(btn, { scale: 1.03, duration: 0.08 }));
+                    }
 
-                // Observe the download overlay open/close to play a short animation
-                const overlay = document.getElementById('download-overlay');
-                if (overlay) {
+                    // Observe the download overlay open/close to play a short animation
+                    const overlay = document.getElementById('download-overlay');
+                    if (overlay) {
                         const card = overlay.querySelector('.download-card');
 
                         const obs = new MutationObserver(muts => {
@@ -1349,7 +1429,7 @@
                                     if (isOpen) {
                                         // show card with pop
                                         if (card) {
-                                            gsap.fromTo(card, { y: 8, scale: 0.98, opacity: 0 }, { y:0, scale:1, opacity:1, duration: 0.32, ease: 'power3.out' });
+                                            gsap.fromTo(card, { y: 8, scale: 0.98, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.32, ease: 'power3.out' });
                                         }
                                         // checkmark animation is handled by CSS (stroke draw + pop)
                                     } else {
@@ -1362,13 +1442,13 @@
                             });
                         });
                         obs.observe(overlay, { attributes: true, attributeFilter: ['class'] });
+                    }
+                } catch (e) {
+                    // don't break the app if GSAP is missing or errors
+                    console.warn('GSAP animation setup failed', e);
                 }
-            } catch (e) {
-                // don't break the app if GSAP is missing or errors
-                console.warn('GSAP animation setup failed', e);
-            }
-        });
-    })();
+            });
+        })();
     </script>
 </body>
 

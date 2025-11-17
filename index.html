@@ -16,6 +16,40 @@
     <!-- GSAP for subtle UI animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
+        :root {
+            /* Light theme colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --text-tertiary: #475569;
+            --input-bg: #ffffff;
+            --input-border: #ddd;
+            --input-focus: #4285f4;
+            --button-bg: #303030;
+            --button-hover: #2b2b2b;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --overlay-bg: rgba(0, 0, 0, 0.38);
+            --card-bg: #fff;
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme colors */
+            --bg-primary: #000000;
+            --bg-secondary: #1a1a1a;
+            --text-primary: #f5f5f5;
+            --text-secondary: #d1d1d1;
+            --text-tertiary: #a8a8a8;
+            --input-bg: #1a1a1a;
+            --input-border: #404040;
+            --input-focus: #60a5fa;
+            --button-bg: #303030;
+            --button-hover: #2b2b2b;
+            --shadow: rgba(0, 0, 0, 0.5);
+            --overlay-bg: rgba(0, 0, 0, 0.75);
+            --card-bg: #1a1a1a;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -24,11 +58,12 @@
         }
 
         html, body {
-            background-color: #ffffff; /* plain white background */
+            background-color: var(--bg-primary);
             padding: 20px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Common styles */
@@ -47,7 +82,8 @@
         h1,
         h2,
         h3 {
-            color: #333;
+            color: var(--text-primary);
+            transition: color 0.4s ease;
         }
 
         /* Special display font for the short KEC title */
@@ -74,27 +110,28 @@
             font-family: 'Inter', Arial, sans-serif;
             font-weight: 600;
             font-size: 18px;
-            color: #2b2b2b;
+            color: var(--text-primary);
             letter-spacing: 0.2px;
             display: block;
             margin-top: 6px;
+            transition: color 0.4s ease;
         }
 
         button,
         .btn {
             padding: 12px 24px;
-            background-color: #4285f4;
+            background-color: var(--button-bg);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, transform 0.2s;
         }
 
         button:hover,
         .btn:hover {
-            background-color: #3367d6;
+            background-color: var(--button-hover);
         }
 
         /* Form styles */
@@ -110,11 +147,12 @@
         .form-subtitle {
             text-align: center;
             margin-bottom: 20px;
-            color: #666;
+            color: var(--text-secondary);
             font-family: 'Inter', Arial, sans-serif;
             font-weight: 400;
             font-size: 15px;
             letter-spacing: 0.2px;
+            transition: color 0.4s ease;
         }
 
         .form-group {
@@ -126,8 +164,9 @@
             margin-bottom: 8px;
             font-family: 'Inter', Arial, sans-serif;
             font-weight: 600;
-            color: #374151; /* slightly darker slate */
+            color: var(--text-primary);
             letter-spacing: 0.2px;
+            transition: color 0.4s ease;
         }
 
         input[type="text"],
@@ -136,10 +175,13 @@
         select {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 10px; /* more rounded corners */
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
             font-size: 16px;
             font-family: 'Inter', Arial, sans-serif;
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            transition: background-color 0.4s ease, border-color 0.3s ease, color 0.4s ease;
         }
 
         /* Placeholder typography to match labels (minimalistic) */
@@ -155,7 +197,7 @@
 
         input[type="text"]:focus,
         input[type="number"]:focus {
-            border-color: #4285f4;
+            border-color: var(--input-focus);
             outline: none;
             box-shadow: 0 0 5px rgba(66, 133, 244, 0.3);
         }
@@ -216,12 +258,24 @@
         #content-to-download {
             width: 210mm;
             height: 297mm;
-            background-color: white;
+            background-color: white !important;
             padding: 20mm 15mm;
             margin: 0;
             position: relative;
             text-align: center;
             box-sizing: border-box;
+        }
+
+        /* Ensure all document content maintains original colors regardless of theme */
+        #content-to-download,
+        #content-to-download * {
+            background-color: white !important;
+            color: black !important;
+        }
+
+        #content-to-download img {
+            /* Keep images as they are */
+            background-color: transparent !important;
         }
 
         .header h1 {
@@ -623,20 +677,96 @@
             text-align: center;
             font-family: 'Inter', Arial, sans-serif;
             font-size: 12px;
-            color: #475569;
+            color: var(--text-tertiary);
             opacity: 0.95;
             z-index: 1;
             pointer-events: auto;
+            transition: color 0.4s ease;
         }
 
         .site-footer a {
-            color: #0f172a;
+            color: var(--text-primary);
             text-decoration: none;
             font-weight: 600;
+            transition: color 0.3s ease;
         }
 
         .site-footer a:hover {
             text-decoration: underline;
+        }
+
+        /* Dark Mode Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--button-bg);
+            border: none;
+            border-radius: 50px;
+            width: 60px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            transition: background-color 0.4s ease;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            background: var(--button-hover);
+            transform: scale(1.05);
+        }
+
+        .theme-toggle-icon {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+        }
+
+        [data-theme="dark"] .theme-toggle-icon {
+            transform: translateX(28px);
+        }
+
+        .theme-toggle-icon::before {
+            transition: opacity 0.3s ease;
+        }
+
+
+        /* Download overlay dark mode adjustments */
+        #download-overlay {
+            background: var(--overlay-bg);
+        }
+
+        .download-card {
+            background: var(--card-bg);
+            transition: background-color 0.4s ease, transform 260ms cubic-bezier(.2,.9,.2,1), opacity 260ms cubic-bezier(.2,.9,.2,1);
+        }
+
+        .download-card .download-msg {
+            color: var(--text-primary);
+            transition: color 0.4s ease;
+        }
+
+        .download-card .download-sub {
+            color: var(--text-tertiary);
+            transition: color 0.4s ease;
+        }
+
+        .download-card .close-overlay {
+            background: var(--button-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        .download-card .close-overlay:hover {
+            background: var(--button-hover);
         }
 
         /* Make the submit button wider on desktop for better balance */
@@ -652,6 +782,11 @@
 </head>
 
 <body>
+    <!-- Dark Mode Toggle -->
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <div class="theme-toggle-icon"></div>
+    </button>
+
     <!-- Download overlay: only show success state after PDF save -->
     <div id="download-overlay" aria-hidden="true">
         <div class="download-card" role="dialog" aria-modal="true" aria-labelledby="download-title">
@@ -830,6 +965,30 @@
     </div>
 
     <script>
+        // Dark Mode Toggle Handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            
+            // Check for saved theme preference or default to light
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            html.setAttribute('data-theme', savedTheme);
+            
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                
+                // Add a subtle pulse animation
+                themeToggle.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    themeToggle.style.transform = 'scale(1)';
+                }, 100);
+            });
+        });
+
         // Wait for the DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', function () {
             // Get form elements

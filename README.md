@@ -21,8 +21,9 @@ KEC Lab Manual Creator solves these problems by providing a simple, device-indep
 - **Preview Mode:** Allows users to review the generated cover before downloading.
 - **PDF Download:** Generates a high-quality PDF of the cover page for easy printing or sharing.
 - **Toast Notifications & Loading Animations:** Provides feedback and improves user experience.
-- **Modern UI:** Uses gradients, icons, and animations for a professional look.
-- **Progressive Web App (PWA):** Can be installed on your device for offline use and a native app-like experience.
+- **Modern UI & Animations:** Uses GSAP animations, smooth transitions, and a minimal aesthetic for a professional look.
+- **Dark Mode & Accessibility:** Theme support (light/dark) and accessible UI controls.
+- **Animated Menu & Loading Screen:** Pull-down menu and a lightweight loading screen replace the old PWA workflows.
 
 ## How It Works
 1. **Fill the Form:** Enter all required details (subject, student, faculty, etc.).
@@ -31,18 +32,15 @@ KEC Lab Manual Creator solves these problems by providing a simple, device-indep
 
 ## Technologies Used
 - **HTML, CSS, JavaScript:** Core web technologies for structure, styling, and interactivity.
-- **Font Awesome:** For modern icons.
-- **Google Fonts (Poppins, Roboto):** For clean, readable typography.
+- **GSAP:** For polished animations and transitions.
 - **html2canvas & jsPDF:** For rendering the cover and generating the PDF.
-- **PWA Manifest & Service Worker:** Enables installation and offline capabilities.
+- **Google Fonts (Bebas Neue, Inter):** Typography used across the app.
 
 ## Folder Structure
 ```
 frontpagekec/
 ├── index.html         # Main application file
 ├── keclogo.jpg        # College logo (used in the cover)
-├── manifest.json      # PWA manifest
-├── service-worker.js  # Service worker for offline support
 ```
 
 ## Usage
@@ -52,21 +50,16 @@ frontpagekec/
 4. Preview the cover page.
 5. Download the PDF and print or share as needed.
 
-## PWA Installation
-- **On Desktop (Chrome/Edge):**
-  1. Click the install icon in the address bar or open the browser menu and select "Install App".
-  2. The app will be added to your desktop and can be launched like any other application.
-- **On Mobile (Android/iOS):**
-  1. Open the site in your browser.
-  2. Tap the browser menu (three dots or share icon).
-  3. Select "Add to Home Screen" or "Install App".
-  4. The app icon will appear on your home screen for quick access and offline use.
-- **Offline Use:**
-  - Once installed, the app works offline and provides a native experience.
+## Note on PWA
+- This project no longer uses a PWA, service worker, or manifest. To keep the codebase lightweight and maintainable, it focuses on a single-page web app experience with client-side PDF generation and animations.
+## Changelog (Short)
+- Updated UI anc removed PWA and offline workflows.
+- Added dark mode, animated menu (drag-to-open), and a minimal loading screen with GSAP animations.
+- Improved accessibility, form validation, and consistent PDF output.
 
 ## Accessibility
-- No installation required (unless you want offline/app experience).
-- Works on any device with a browser (including smartphones).
+- No installation required — works in any modern browser.
+- Works on any device (including smartphones and tablets).
 - No dependencies on OS or external software.
 
 ## Contributing

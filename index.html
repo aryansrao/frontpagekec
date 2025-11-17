@@ -9,6 +9,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    
+    <!-- Preload logo for loading screen -->
+    <link rel="preload" href="keclogo.jpg" as="image">
 
     <!-- Libraries for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -55,6 +58,91 @@
             padding: 0;
             box-sizing: border-box;
             font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .loading-title {
+            font-family: 'Bebas Neue', Arial, sans-serif;
+            font-size: 64px;
+            color: var(--text-primary);
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .loading-subtitle {
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 1px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .loading-bar-container {
+            width: 200px;
+            height: 4px;
+            background: var(--input-border);
+            border-radius: 2px;
+            margin: 40px auto 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--button-bg);
+            border-radius: 2px;
+        }
+
+        .loading-hint {
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 14px;
+            color: var(--text-tertiary);
+            margin-top: 50px;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .loading-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--button-bg);
+            border-radius: 50%;
+            opacity: 0;
         }
 
         html,
@@ -992,6 +1080,19 @@
 </head>
 
 <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <img src="keclogo.jpg" alt="KEC Logo" class="loading-logo">
+            <h1 class="loading-title">KEC</h1>
+            <p class="loading-subtitle">Front Page Creator</p>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+            <p class="loading-hint">Click on the logo or drag down to open menu</p>
+        </div>
+    </div>
+
     <!-- Blur backdrop for menu -->
     <div class="menu-backdrop-blur" id="menu-backdrop"></div>
 
@@ -1200,6 +1301,78 @@
     </div>
 
     <script>
+        // Loading Screen Animation
+        window.addEventListener('load', function() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const tl = gsap.timeline();
+
+            // Bouncy entrance animations
+            tl.to('.loading-logo', {
+                opacity: 1,
+                scale: 1,
+                duration: 0.6,
+                ease: 'back.out(1.7)',
+                delay: 0.2
+            })
+            .to('.loading-title', {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                ease: 'back.out(1.4)'
+            }, '-=0.3')
+            .to('.loading-subtitle', {
+                opacity: 1,
+                y: 0,
+                duration: 0.4,
+                ease: 'power2.out'
+            }, '-=0.2')
+            .to('.loading-bar-container', {
+                opacity: 1,
+                duration: 0.3,
+                ease: 'power2.out'
+            }, '-=0.2')
+            .to('.loading-bar', {
+                width: '100%',
+                duration: 1.8,
+                ease: 'power2.inOut'
+            }, '-=0.1')
+            .to('.loading-hint', {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                ease: 'power2.out'
+            }, '-=1.2');
+
+            // Subtle pulse animation on hint text
+            gsap.to('.loading-hint', {
+                opacity: 0.5,
+                duration: 1.5,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+                delay: 1
+            });
+
+            // Slide loading screen up and trigger main page animations with overlap
+            setTimeout(() => {
+                gsap.to(loadingScreen, {
+                    y: '-100%',
+                    duration: 0.8,
+                    ease: 'power3.inOut',
+                    onComplete: () => {
+                        loadingScreen.classList.add('hidden');
+                    }
+                });
+                
+                // Start main page animations slightly before loading screen finishes sliding
+                setTimeout(() => {
+                    if (window.runMainPageAnimations) {
+                        window.runMainPageAnimations();
+                    }
+                }, 400); // Start 400ms into the slide (halfway through the 800ms slide)
+            }, 2500);
+        });
+
         // Menu and Dark Mode Handler
         document.addEventListener('DOMContentLoaded', function () {
             const dropdown = document.getElementById('dropdown');
@@ -1788,8 +1961,13 @@
     <!-- GSAP animations: entrance, button interactions, overlay animations -->
     <script>
         (function () {
-            // Wait for DOM ready
-            document.addEventListener('DOMContentLoaded', () => {
+            let mainAnimationsReady = false;
+
+            // Function to run main page entrance animations
+            function runMainPageAnimations() {
+                if (mainAnimationsReady) return; // Prevent duplicate runs
+                mainAnimationsReady = true;
+
                 try {
                     // Entrance: container and form groups
                     gsap.from('.container', { duration: 0.6, y: 16, opacity: 0, ease: 'power3.out' });
@@ -1802,7 +1980,17 @@
                     // Logo subtle pop
                     const logo = document.querySelector('.kec-logo-img');
                     if (logo) gsap.from(logo, { duration: 0.6, scale: 0.96, opacity: 0, delay: 0.05, ease: 'back.out(1.1)' });
+                } catch (e) {
+                    console.warn('GSAP entrance animations failed', e);
+                }
+            }
 
+            // Make function globally accessible so loading screen can trigger it
+            window.runMainPageAnimations = runMainPageAnimations;
+
+            // Wait for DOM ready to set up interactions
+            document.addEventListener('DOMContentLoaded', () => {
+                try {
                     // Button hover and tap interactions
                     const btn = document.querySelector('.submit-btn');
                     if (btn) {
